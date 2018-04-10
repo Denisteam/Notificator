@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "298427290740",
+    "firebase_url": "https://notificator-1c907.firebaseio.com",
+    "project_id": "notificator-1c907",
+    "storage_bucket": "notificator-1c907.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298427290740:android:7625e82ccc1b76da",
+        "android_client_info": {
+          "package_name": "ru.tomsksoft.notificator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "298427290740-7535mvdf39p3d2k7741t2uakado1m3rf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.tomsksoft.notificator",
+            "certificate_hash": "fbb3255139c54e69d744d9b20caa67ebb40fa743"
+          }
+        },
+        {
+          "client_id": "298427290740-8is3qn2ikfekd36bpoij2evl8js7m0nu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOVw8Z7SkKyAFTtkBlJOkeWY1-cLlg044"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "298427290740-8is3qn2ikfekd36bpoij2evl8js7m0nu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
