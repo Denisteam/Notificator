@@ -15,7 +15,8 @@ public class AlarmBootReceiver extends BroadcastReceiver {
     PendingIntent alarmIntent;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent)
+    {
         Context appContext = context.getApplicationContext();
         am = (AlarmManager)appContext.getSystemService(Context.ALARM_SERVICE);
         Intent target = new Intent(appContext, AlarmReceiver.class);
@@ -36,5 +37,6 @@ public class AlarmBootReceiver extends BroadcastReceiver {
 
         am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 1000 * 60 * 60 * 24, alarmIntent);
+        System.out.println("onReceive--------2------------!!!!!!!!!");
     }
 }
