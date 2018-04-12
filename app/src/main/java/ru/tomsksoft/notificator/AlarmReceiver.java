@@ -15,6 +15,7 @@ import android.support.v4.app.NotificationCompat;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class AlarmReceiver extends BroadcastReceiver {
     Context appContext;
@@ -22,12 +23,10 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent)
     {
-        System.out.println("onReceive--------------------!!!!!!!!!");
-
         appContext = context.getApplicationContext();
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(appContext);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", Locale.ENGLISH);
         Date date = new Date();
         String dayOfWeek = dateFormat.format(date).toUpperCase();
         boolean rightDay = sharedPref.getBoolean(dayOfWeek, false);
@@ -39,7 +38,6 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private void sendNotification(String messageBody)
     {
-        System.out.println("sendNotif--------------------!!!!!!!!!");
         Intent intent = new Intent(appContext, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(appContext, 0, intent,

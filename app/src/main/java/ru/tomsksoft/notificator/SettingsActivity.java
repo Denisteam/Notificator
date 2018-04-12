@@ -4,14 +4,13 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +21,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import java.util.Calendar;
+import java.util.Date;
 
 
 public class SettingsActivity extends AppCompatActivity
@@ -119,7 +119,7 @@ public class SettingsActivity extends AppCompatActivity
     {
         updateDays();
 
-        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
@@ -131,11 +131,11 @@ public class SettingsActivity extends AppCompatActivity
 
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        System.out.println(calendar.getTimeInMillis() + "  " + hourOfDay + "  " + minute);
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.set(Calendar.MINUTE, minute);
-
-        System.out.println(calendar.toString() + " -------------!!!!!!!!!!");
+        calendar.set(Calendar.MILLISECOND, 0);
+        System.out.println(calendar.getTimeInMillis());
 
         am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 1000 * 60 * 60 * 24, alarmIntent);
