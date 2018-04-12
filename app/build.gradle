@@ -21,6 +21,11 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    dexOptions {
+        maxProcessCount 1
+        javaMaxHeapSize '1200m'
+    }
 }
 
 configurations.all {
