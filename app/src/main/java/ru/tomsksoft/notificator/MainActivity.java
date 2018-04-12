@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
 
         final TimePicker tp = (TimePicker) findViewById(R.id.timePicker);
         tp.setIs24HourView(true);
+        tp.setCurrentHour(0);
+        tp.setCurrentMinute(0);
 
         final LinearLayout layout2 = (LinearLayout)findViewById(R.id.layout2);
         final TextView timeText = (TextView)findViewById(R.id.time_text);

@@ -1,11 +1,13 @@
 package ru.tomsksoft.notificator;
 
 
-public enum DayOfWeek {
+public enum DayOfWeek
+{
     MONDAY,
     TUESDAY,
     WEDNESDAY,
     THURSDAY,
     FRIDAY,
-    SATURDAY;
+    SATURDAY,
+    SUNDAY;
 }

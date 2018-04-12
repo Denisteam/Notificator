@@ -30,6 +30,8 @@ public class SettingsActivity extends AppCompatActivity
     PendingIntent alarmIntent;
     boolean changed;
     TimePicker tp;
+    ToggleButton setAlarmTB;
+    ToggleButton setPenetrationTB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -45,32 +47,50 @@ public class SettingsActivity extends AppCompatActivity
 
         tp = (TimePicker) findViewById(R.id.timePicker);
         tp.setIs24HourView(true);
-
+//---------------------------------------------------------------------------------------------------
         final LinearLayout alarmSettingsLayout = findViewById(R.id.alarmSettingsLayout);
         final LinearLayout addAlarmLayout = findViewById(R.id.addAlarmLayout);
 
         final SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
 
-        final ToggleButton setAlarmTB = findViewById(R.id.toggleButtonSetAlarm);
+        setAlarmTB = findViewById(R.id.toggleButtonSetAlarm);
+        setPenetrationTB = findViewById(R.id.toggleButtonSetPenetration);
 
-        setAlarmTB.setChecked(sharedPref.getBoolean("set_Alarm", false));
+        loadAlarmParam();
+//---------------------------------------------------------------------------------------------------
+        //setAlarmTB.setChecked(sharedPref.getBoolean("set_Alarm", false));
         if (setAlarmTB.isChecked())
+        {
             setAlarmTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
+            alarmSettingsLayout.setVisibility(View.VISIBLE);
+            addAlarmLayout.setVisibility(View.VISIBLE);
+        }
         else
             setAlarmTB.setBackgroundColor(Color.RED);
+
         setAlarmTB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("set_Alarm", isChecked);
-                editor.apply();
+                saveAlarmParam();
                 if (isChecked)
                 {
-                    setAlarmTB.setBackgroundColor(Color.argb(100, 0, 60, 80));
+                    setAlarmTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
                     alarmSettingsLayout.setVisibility(View.VISIBLE);
+                    addAlarmLayout.setVisibility(View.VISIBLE);
+                    loadAlarmParam();
+                    //((CheckBox)findViewById(R.id.checkBox1)).setChecked(sharedPref.getBoolean(DayOfWeek.MONDAY.toString(), false));
+                    //((CheckBox)findViewById(R.id.checkBox2)).setChecked(sharedPref.getBoolean(DayOfWeek.TUESDAY.toString(), false));
+                   //((CheckBox)findViewById(R.id.checkBox3)).setChecked(sharedPref.getBoolean(DayOfWeek.WEDNESDAY.toString(), false));
+                    //((CheckBox)findViewById(R.id.checkBox4)).setChecked(sharedPref.getBoolean(DayOfWeek.THURSDAY.toString(), false));
+                   // ((CheckBox)findViewById(R.id.checkBox5)).setChecked(sharedPref.getBoolean(DayOfWeek.FRIDAY.toString(), false));
+                    //((CheckBox)findViewById(R.id.checkBox6)).setChecked(sharedPref.getBoolean(DayOfWeek.SATURDAY.toString(), false));
+                    //((CheckBox)findViewById(R.id.checkBox7)).setChecked(sharedPref.getBoolean(DayOfWeek.SUNDAY.toString(), false));
+                    //tp.setCurrentHour(sharedPref.getInt("hour", 0));
+                    //tp.setCurrentMinute(sharedPref.getInt("minute", 0));
                 }
                 else
                 {
+
                     setAlarmTB.setBackgroundColor(Color.RED);
                     alarmSettingsLayout.setVisibility(View.INVISIBLE);
                     addAlarmLayout.setVisibility(View.INVISIBLE);
@@ -78,25 +98,50 @@ public class SettingsActivity extends AppCompatActivity
                 }
             }
         });
+//---------------------------------------------------------------------------------------------------
+        //setPenetrationTB.setChecked(sharedPref.getBoolean("set_Penetration", true));
+        if (setPenetrationTB.isChecked())
+        {
+            setPenetrationTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
+        }
+        else
+            setPenetrationTB.setBackgroundColor(Color.RED);
 
-        CheckBox c = findViewById(R.id.checkBox1);
-        c.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        setPenetrationTB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                saveAlarmParam();
+                if (isChecked)
+                {
+                    setPenetrationTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
+                }
+                else
+                {
+                    setPenetrationTB.setBackgroundColor(Color.RED);
+                }
+            }
+        });
+//---------------------------------------------------------------------------------------------------
+        CompoundButton.OnCheckedChangeListener checkerListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     addAlarmLayout.setVisibility(View.VISIBLE);
             }
-        });
+        };
+        ((CheckBox)findViewById(R.id.checkBox1)).setOnCheckedChangeListener(checkerListener);
+        ((CheckBox)findViewById(R.id.checkBox2)).setOnCheckedChangeListener(checkerListener);
+        ((CheckBox)findViewById(R.id.checkBox3)).setOnCheckedChangeListener(checkerListener);
+        ((CheckBox)findViewById(R.id.checkBox4)).setOnCheckedChangeListener(checkerListener);
+        ((CheckBox)findViewById(R.id.checkBox5)).setOnCheckedChangeListener(checkerListener);
+        ((CheckBox)findViewById(R.id.checkBox6)).setOnCheckedChangeListener(checkerListener);
+        ((CheckBox)findViewById(R.id.checkBox7)).setOnCheckedChangeListener(checkerListener);
+//---------------------------------------------------------------------------------------------------
         tp.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 addAlarmLayout.setVisibility(View.VISIBLE);
             }
         });
-    }
-
-    public void setPenetrationSignalOnClick(View view)
-    {
-        //TODO
     }
 
     public void onClickSetAlarm(View view)
@@ -173,11 +218,47 @@ public class SettingsActivity extends AppCompatActivity
         editor.apply();
     }
 
+    private void saveAlarmParam()
+    {
+        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("set_Alarm", setAlarmTB.isChecked());
+        editor.putBoolean("set_Penetration", setPenetrationTB.isChecked());
+        editor.putBoolean(DayOfWeek.MONDAY.toString(), ((CheckBox)findViewById(R.id.checkBox1)).isChecked());
+        editor.putBoolean(DayOfWeek.TUESDAY.toString(), ((CheckBox)findViewById(R.id.checkBox2)).isChecked());
+        editor.putBoolean(DayOfWeek.WEDNESDAY.toString(), ((CheckBox)findViewById(R.id.checkBox3)).isChecked());
+        editor.putBoolean(DayOfWeek.THURSDAY.toString(), ((CheckBox)findViewById(R.id.checkBox4)).isChecked());
+        editor.putBoolean(DayOfWeek.FRIDAY.toString(), ((CheckBox)findViewById(R.id.checkBox5)).isChecked());
+        editor.putBoolean(DayOfWeek.SATURDAY.toString(), ((CheckBox)findViewById(R.id.checkBox6)).isChecked());
+        editor.putBoolean(DayOfWeek.SUNDAY.toString(), ((CheckBox)findViewById(R.id.checkBox7)).isChecked());
+        editor.putInt("hour", tp.getCurrentHour());
+        editor.putInt("minute", tp.getCurrentMinute());
+        editor.apply();
+    }
+
+    private void loadAlarmParam()
+    {
+        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+        setAlarmTB.setChecked(sharedPref.getBoolean("set_Alarm", false));
+        setPenetrationTB.setChecked(sharedPref.getBoolean("set_Penetration", true));
+        ((CheckBox)findViewById(R.id.checkBox1)).setChecked(sharedPref.getBoolean(DayOfWeek.MONDAY.toString(), false));
+        ((CheckBox)findViewById(R.id.checkBox2)).setChecked(sharedPref.getBoolean(DayOfWeek.TUESDAY.toString(), false));
+        ((CheckBox)findViewById(R.id.checkBox3)).setChecked(sharedPref.getBoolean(DayOfWeek.WEDNESDAY.toString(), false));
+        ((CheckBox)findViewById(R.id.checkBox4)).setChecked(sharedPref.getBoolean(DayOfWeek.THURSDAY.toString(), false));
+        ((CheckBox)findViewById(R.id.checkBox5)).setChecked(sharedPref.getBoolean(DayOfWeek.FRIDAY.toString(), false));
+        ((CheckBox)findViewById(R.id.checkBox6)).setChecked(sharedPref.getBoolean(DayOfWeek.SATURDAY.toString(), false));
+        ((CheckBox)findViewById(R.id.checkBox7)).setChecked(sharedPref.getBoolean(DayOfWeek.SUNDAY.toString(), false));
+        tp.setCurrentHour(sharedPref.getInt("hour", 0));
+        tp.setCurrentMinute(sharedPref.getInt("minute", 0));
+    }
+
     @Override
     public void onBackPressed()
     {
         if ((findViewById(R.id.addAlarmLayout)).getVisibility() == View.VISIBLE)
             Toast.makeText(SettingsActivity.this, "отменено", Toast.LENGTH_SHORT).show();
+
+        saveAlarmParam();
 
         Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
         startActivity(intent);
@@ -188,6 +269,7 @@ public class SettingsActivity extends AppCompatActivity
     @Override
     public void onDestroy()
     {
+        saveAlarmParam();
         moveTaskToBack(true);
 
         super.onDestroy();
