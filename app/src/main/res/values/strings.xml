@@ -153,4 +153,5 @@
     <string name="set_notification">Поставить напоминание</string>
     <string name="accept_changes">Подтвердить изменения</string>
     <string name="alert">Внимание!</string>
+    <string name="login">Логин</string>
 </resources>

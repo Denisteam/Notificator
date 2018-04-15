@@ -33,7 +33,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
 
-        if (rightDay) { sendNotification("test"); }
+        if (rightDay) { sendNotification("Если вы опаздываете -  оповетите об этом"); }
     }
 
     private void sendNotification(String messageBody)
@@ -47,8 +47,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(appContext, channelId)
-                        .setSmallIcon(R.drawable.ic_stat_ic_notification)
-                        .setContentTitle("FCM MessageSender")
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Notificator")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
