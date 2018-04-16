@@ -1,5 +1,6 @@
 package ru.tomsksoft.notificator;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -44,14 +45,14 @@ public class AlarmReceiver extends BroadcastReceiver {
                 PendingIntent.FLAG_ONE_SHOT);
 
         String channelId = appContext.getString(R.string.default_notification_channel_id);
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(appContext, channelId)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("Notificator")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
-                        .setSound(defaultSoundUri)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setDefaults(Notification.DEFAULT_ALL)
                         .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =

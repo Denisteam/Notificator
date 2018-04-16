@@ -1,20 +1,17 @@
 package ru.tomsksoft.notificator;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
-import com.firebase.jobdispatcher.FirebaseJobDispatcher;
-import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.firebase.jobdispatcher.Job;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -51,17 +48,26 @@ public class MessagingService extends FirebaseMessagingService {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
+        int priority;
+        SharedPreferences sharedPref = getSharedPreferences("app_settings", Context.MODE_PRIVATE);
+        if(sharedPref.getBoolean("set_Penetration", true))
+            priority = NotificationCompat.PRIORITY_MAX;
+        else
+            priority = NotificationCompat.PRIORITY_DEFAULT;
 
         String channelId = getString(R.string.default_notification_channel_id);
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.drawable.ic_stat_ic_notification)
+                        .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("FCM MessageSender")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
-                        .setSound(defaultSoundUri)
+                        .setPriority(priority)
+                        .setDefaults(Notification.DEFAULT_ALL)
                         .setContentIntent(pendingIntent);
+
+        Notification notification = notificationBuilder.build();
+        notification.flags = Notification.FLAG_INSISTENT;
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -73,6 +79,6 @@ public class MessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0, notificationBuilder.build());
+        notificationManager.notify(0, notification);
     }
 }

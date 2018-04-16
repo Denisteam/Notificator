@@ -58,7 +58,6 @@ public class SettingsActivity extends AppCompatActivity
 
         loadAlarmParam();
 //---------------------------------------------------------------------------------------------------
-        //setAlarmTB.setChecked(sharedPref.getBoolean("set_Alarm", false));
         if (setAlarmTB.isChecked())
         {
             setAlarmTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
@@ -78,15 +77,6 @@ public class SettingsActivity extends AppCompatActivity
                     alarmSettingsLayout.setVisibility(View.VISIBLE);
                     addAlarmLayout.setVisibility(View.VISIBLE);
                     loadAlarmParam();
-                    //((CheckBox)findViewById(R.id.checkBox1)).setChecked(sharedPref.getBoolean(DayOfWeek.MONDAY.toString(), false));
-                    //((CheckBox)findViewById(R.id.checkBox2)).setChecked(sharedPref.getBoolean(DayOfWeek.TUESDAY.toString(), false));
-                   //((CheckBox)findViewById(R.id.checkBox3)).setChecked(sharedPref.getBoolean(DayOfWeek.WEDNESDAY.toString(), false));
-                    //((CheckBox)findViewById(R.id.checkBox4)).setChecked(sharedPref.getBoolean(DayOfWeek.THURSDAY.toString(), false));
-                   // ((CheckBox)findViewById(R.id.checkBox5)).setChecked(sharedPref.getBoolean(DayOfWeek.FRIDAY.toString(), false));
-                    //((CheckBox)findViewById(R.id.checkBox6)).setChecked(sharedPref.getBoolean(DayOfWeek.SATURDAY.toString(), false));
-                    //((CheckBox)findViewById(R.id.checkBox7)).setChecked(sharedPref.getBoolean(DayOfWeek.SUNDAY.toString(), false));
-                    //tp.setCurrentHour(sharedPref.getInt("hour", 0));
-                    //tp.setCurrentMinute(sharedPref.getInt("minute", 0));
                 }
                 else
                 {
