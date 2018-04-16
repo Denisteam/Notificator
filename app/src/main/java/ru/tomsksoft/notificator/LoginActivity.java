@@ -26,6 +26,9 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onClickLogIn(View view)
     {
+        String login = ((EditText)findViewById(R.id.login)).getText().toString();
+        String password = ((EditText)findViewById(R.id.password)).getText().toString();
+
         //TODO проверку логина и пароля
 
         ProgressBar pb = findViewById(R.id.login_progress);
