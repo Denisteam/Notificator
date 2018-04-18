@@ -133,6 +133,7 @@ public class LoginActivity extends AppCompatActivity {
         {
             Log.d(TAG, "incorrect data: " + e.getMessage());
             Toast.makeText(LoginActivity.this, R.string.incorrect_data, Toast.LENGTH_LONG).show();
+            alreadyTriedAuthenticating = false;
             pb.setVisibility(View.INVISIBLE);
             layout.setVisibility(View.VISIBLE);
         }
