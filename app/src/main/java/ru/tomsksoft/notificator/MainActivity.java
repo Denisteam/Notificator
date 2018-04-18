@@ -75,7 +75,11 @@ public class MainActivity extends AppCompatActivity {
         logTokenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MessageSender.sendMessage(MainActivity.this, MESSAGE, "i_am_here");
+                try {
+                    MessageSender.sendMessage(MainActivity.this, "12:55");
+                } catch (IncorrectDataException e) {
+                    //TODO(Nikich): tell user about entered incorrect data
+                }
                 Toast.makeText(MainActivity.this, "отправлено", Toast.LENGTH_SHORT).show();
             }
         });

@@ -26,7 +26,7 @@ public class AlarmBootReceiver extends BroadcastReceiver {
         int hourOfDay = sharedPref.getInt("hour", -1);
         int minute = sharedPref.getInt("minute", -1);
 
-        if (minute == - 1 || hourOfDay == -1) {
+        if (minute == -1 || hourOfDay == -1) {
             return;
         }
 
@@ -35,8 +35,7 @@ public class AlarmBootReceiver extends BroadcastReceiver {
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.set(Calendar.MINUTE, minute);
 
-        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() - 60 * 1000,
                 1000 * 60 * 60 * 24, alarmIntent);
-        System.out.println("onReceive--------2------------!!!!!!!!!");
     }
 }

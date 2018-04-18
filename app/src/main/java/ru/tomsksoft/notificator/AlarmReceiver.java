@@ -42,7 +42,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Intent intent = new Intent(appContext, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(appContext, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
         String channelId = appContext.getString(R.string.default_notification_channel_id);
         NotificationCompat.Builder notificationBuilder =
