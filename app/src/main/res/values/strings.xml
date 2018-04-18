@@ -44,6 +44,9 @@
     <string name="saturday" >СБ</string>
     <string name="sunday">ВС</string>
     <string name="friday">ПТ</string>
+    <string name="ok">Ок</string>
+    <string name="no">Нет</string>
+    <string name="yes">Да</string>
     <string-array name="templates">
         <item>Я на месте</item>
         <item>Я опаздываю</item>
@@ -153,5 +156,9 @@
     <string name="set_notification">Поставить напоминание</string>
     <string name="accept_changes">Подтвердить изменения</string>
     <string name="alert">Внимание!</string>
+    <string name="connection_error">Ошибка соединения</string>
+    <string name="connection_error_message">Ошибка соединения с сервером. Проверьте наличие соединения с интернет</string>
     <string name="login">Логин</string>
+    <string name="incorrect_data">Введены некорректные данные</string>
+    <string name="are_you_sure_to_exit">Вы действительно хотите выйти из учётной записи?</string>
 </resources>

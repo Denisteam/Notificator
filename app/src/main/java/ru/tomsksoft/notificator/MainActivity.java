@@ -1,17 +1,23 @@
 package ru.tomsksoft.notificator;
 
+import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -31,6 +37,13 @@ import static ru.tomsksoft.notificator.MessageType.MESSAGE;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,21 +91,22 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     MessageSender.sendMessage(MainActivity.this, "12:55");
                 } catch (IncorrectDataException e) {
-                    //TODO(Nikich): tell user about entered incorrect data
+                    Toast.makeText(MainActivity.this, R.string.incorrect_data, Toast.LENGTH_LONG).show();
                 }
                 Toast.makeText(MainActivity.this, "отправлено", Toast.LENGTH_SHORT).show();
             }
         });
 
-        final TimePicker tp = (TimePicker) findViewById(R.id.timePicker);
+        final TimePicker tp = findViewById(R.id.timePicker);
         tp.setIs24HourView(true);
         tp.setCurrentHour(0);
         tp.setCurrentMinute(0);
 
-        final LinearLayout layout2 = (LinearLayout)findViewById(R.id.layout2);
-        final TextView timeText = (TextView)findViewById(R.id.time_text);
+        final LinearLayout layout2 = findViewById(R.id.layout2);
+        final LinearLayout layout3 = findViewById(R.id.layout3);
+        final TextView timeText = findViewById(R.id.time_text);
 
-        final Spinner spinnerTemplate = (Spinner)findViewById(R.id.template_spinner);
+        final Spinner spinnerTemplate = findViewById(R.id.template_spinner);
         spinnerTemplate.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
@@ -102,12 +116,14 @@ public class MainActivity extends AppCompatActivity {
                     case 0:
                         //Ставим шаблон
                         layout2.setVisibility(View.INVISIBLE);
+                        layout3.setVisibility(View.INVISIBLE);
                         timeText.setVisibility(View.INVISIBLE);
                         tp.setVisibility(View.INVISIBLE);
                         break;
                     case 1:
                         //Ставим шаблон
                         layout2.setVisibility(View.VISIBLE);
+                        layout3.setVisibility(View.VISIBLE);
                         timeText.setVisibility(View.VISIBLE);
                         tp.setVisibility(View.VISIBLE);
                         break;
@@ -121,6 +137,47 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.settings:
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.exit:
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+                final SharedPreferences.Editor editor = sharedPref.edit();
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(R.string.alert)
+                        .setMessage(R.string.are_you_sure_to_exit)
+                        .setCancelable(false)
+                        .setNegativeButton(R.string.no,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                })
+                .setPositiveButton(R.string.yes,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                editor.putString("login", "login");
+                                editor.putString("password", "password");
+                                editor.apply();
+                                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                startActivity(intent);
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public void onClickSettings (View view)

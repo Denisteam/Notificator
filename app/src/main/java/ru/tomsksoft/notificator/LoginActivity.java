@@ -1,7 +1,9 @@
 package ru.tomsksoft.notificator;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,9 +14,13 @@ import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -40,18 +46,41 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "Login";
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_login, menu);
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        //((EditText)findViewById(R.id.login)).setText("ntakovoy");
+        //((EditText)findViewById(R.id.password)).setText("aoiwnu91su3");
+    }
 
-
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.settings)
+        {
+            Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void onClickLogIn(View view)
     {
         final String login = ((EditText)findViewById(R.id.login)).getText().toString();
         final String password = ((EditText)findViewById(R.id.password)).getText().toString();
+
+        ProgressBar pb = findViewById(R.id.login_progress);
+        pb.setVisibility(View.VISIBLE);
+        LinearLayout layout = findViewById(R.id.log_in_layout);
+        layout.setVisibility(View.INVISIBLE);
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -64,43 +93,61 @@ public class LoginActivity extends AppCompatActivity {
         });
         executor.shutdown();
 
-
-
-
-        try {
+        try
+        {
             executor.awaitTermination(5, TimeUnit.SECONDS);
-            if (result.isDone()) {
+            if (result.isDone())
+            {
                 boolean res = result.get();
                 Log.d(TAG, "connecting result: " + String.valueOf(res));
-                if (res == true) {
-                    ProgressBar pb = findViewById(R.id.login_progress);
-                    pb.setVisibility(View.VISIBLE);
-
+                if (res)
+                {
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
-                } else {
+                }
+                else
+                {
                     Log.d(TAG, "Too long waiting");
-                    //TODO(Nikich): if your are here, it means that something went wrong
-                    //server not available or something like that
-
+                    pb.setVisibility(View.INVISIBLE);
+                    layout.setVisibility(View.VISIBLE);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                    builder.setTitle(R.string.connection_error)
+                            .setMessage(R.string.connection_error_message)
+                            .setCancelable(false)
+                            .setNegativeButton(R.string.ok,
+                                    new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            dialog.cancel();
+                                        }
+                                    });
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
                 }
             }
-        } catch (InterruptedException e) {
+        }
+        catch (InterruptedException e)
+        {
             e.printStackTrace();
-        } catch (ExecutionException e) {
+            pb.setVisibility(View.INVISIBLE);
+            layout.setVisibility(View.VISIBLE);
+        }
+        catch (ExecutionException e)
+        {
             Log.d(TAG, "incorrect data: " + e.getMessage());
-            //TODO(Nikich): show message about incorrect data
+            Toast.makeText(LoginActivity.this, R.string.incorrect_data, Toast.LENGTH_LONG).show();
+            pb.setVisibility(View.INVISIBLE);
+            layout.setVisibility(View.VISIBLE);
         }
     }
 
-    private boolean checkLogIn(final String userName, final String passvord) throws IncorrectDataException {
+    private boolean checkLogIn(final String userName, final String password) throws IncorrectDataException {
         URL url = null;
         try {
             url = new URL("https://extern.tomsksoft.com/user/note/set/");
 
             Authenticator.setDefault(new Authenticator(){
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(userName, passvord.toCharArray());
+                    return new PasswordAuthentication(userName, password.toCharArray());
                 }});
 
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -114,12 +161,12 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("login", userName);
-                editor.putString("password", passvord);
+                editor.putString("password", password);
                 editor.apply();
 
                 return true;
             } else if(rc == 401) {
-                throw new IncorrectDataException(userName + ":" + passvord);
+                throw new IncorrectDataException(userName + ":" + password);
             }
             connection.disconnect();
 

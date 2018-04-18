@@ -23,20 +23,19 @@
 
         <ImageButton
             android:id="@+id/timer_button"
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:background="@android:color/holo_blue_dark"
-            android:contentDescription="@string/todo"
             android:onClick="onClickSettings"
-            app:srcCompat="@android:drawable/ic_lock_idle_alarm" />
+            app:srcCompat="@android:drawable/ic_lock_idle_alarm"
+            android:layout_width="0dp" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layout2"
         android:layout_width="match_parent"
-        android:layout_height="59dp"
+        android:layout_height="60dp"
         android:orientation="vertical">
 
         <TextView
@@ -56,30 +55,24 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/additionally" />
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/layout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:text="@string/additionally" />
 
         <EditText
             android:id="@+id/messageField"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
             android:ems="10"
             android:inputType="textMultiLine"
             tools:ignore="LabelFor" />
