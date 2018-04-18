@@ -24,7 +24,7 @@
     <string name="log_out">Выйти</string>
     <string name="new_message">Новое сообщение</string>
     <string name="send_message">Отправить сообщение</string>
-    <string name="time_of_arrival">Ожидаемое время прибытия</string>
+    <string name="time_of_arrival">Опаздаю на</string>
     <string name="send_message_button">Отправить</string>
     <string name="message_type">Тип сообщения</string>
     <string name="message_template">Шаблоны</string>
@@ -34,6 +34,7 @@
     <string name="set_penetration_signal">Звуковой сигнал через беззвучный режим</string>
     <string name="message">Сообщение</string>
     <string name="settings">Настройки</string>
+    <string name="sending">Отправлено</string>
     <string name="set_notify_timer">Установка времени срабатывания предупреждения</string>
     <string name="set_alarm">Включить предупреждения  по времени</string>
     <string name="i_am_here">Я на месте</string>

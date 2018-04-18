@@ -21,15 +21,6 @@
             android:layout_weight="1"
             android:entries="@array/templates" />
 
-        <ImageButton
-            android:id="@+id/timer_button"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:background="@android:color/holo_blue_dark"
-            android:onClick="onClickSettings"
-            app:srcCompat="@android:drawable/ic_lock_idle_alarm"
-            android:layout_width="0dp" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -111,6 +102,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="2"
+            android:onClick="onClickSendMessage"
             android:background="@android:color/holo_blue_dark"
             android:text="@string/send_message_button" />
 

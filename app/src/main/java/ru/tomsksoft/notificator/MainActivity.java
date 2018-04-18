@@ -31,12 +31,21 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.Calendar;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import static android.Manifest.permission.READ_PHONE_STATE;
 import static ru.tomsksoft.notificator.MessageType.MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private TimePicker tp;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -82,22 +91,7 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
 //            }
 //        });
-
-
-        Button logTokenButton = findViewById(R.id.send_message);
-        logTokenButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    MessageSender.sendMessage(MainActivity.this, "12:55");
-                } catch (IncorrectDataException e) {
-                    Toast.makeText(MainActivity.this, R.string.incorrect_data, Toast.LENGTH_LONG).show();
-                }
-                Toast.makeText(MainActivity.this, "отправлено", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        final TimePicker tp = findViewById(R.id.timePicker);
+        tp = findViewById(R.id.timePicker);
         tp.setIs24HourView(true);
         tp.setCurrentHour(0);
         tp.setCurrentMinute(0);
@@ -186,6 +180,45 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void onClickSendMessage(View view)
+    {
+        System.out.println(String.valueOf(Calendar.getInstance().getTime().getHours() + tp.getCurrentHour())
+                + ":" + String.valueOf(Calendar.getInstance().getTime().getMinutes() + tp.getCurrentMinute()));
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        Future<Boolean> result = executor.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                return MessageSender.sendMessage(MainActivity.this, String.valueOf(Calendar.getInstance().getTime().getHours() + tp.getCurrentHour())
+                        + ":" + String.valueOf(Calendar.getInstance().getTime().getMinutes() + tp.getCurrentMinute()));
+            }
+        });
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+            if (result.isDone())
+            {
+                try {
+                    if (result.get())
+                    {
+                        Toast.makeText(MainActivity.this, "отправлено", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(MainActivity.this, R.string.connection_error, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Toast.makeText(MainActivity.this, R.string.sending, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -206,5 +239,6 @@ public class MainActivity extends AppCompatActivity {
         System.runFinalizersOnExit(true);
         System.exit(0);
     }
+
 }
 
