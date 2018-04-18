@@ -22,6 +22,7 @@ public class MessageSender
     private static final String TAG  = "MessageSender";
     private static final String SENDER_ID = "AAAARXunFHQ:APA91bFg3eJGuJgy1V5qjHuYgjchhfxRonJ_VeIlFnYVk7onc2k1wvLWngCsu5flIbVTS1oW05kLQJN0erO2LIgbKxtxD8M1zHK9JOfgSJU6AlMgQTG3P7zbcutK1sF16vc1T7QRA8qB";
     private static final AtomicInteger msgId = new AtomicInteger();
+    private static final int TIMEOUT_VALUE = 5000;
 
 
     public static boolean sendMessage(Context context, String time) throws IncorrectDataException
@@ -42,6 +43,8 @@ public class MessageSender
                 }});
 
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setConnectTimeout(TIMEOUT_VALUE);
+            connection.setReadTimeout(TIMEOUT_VALUE);
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setRequestMethod("POST");

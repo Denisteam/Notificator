@@ -1,18 +1,12 @@
 package ru.tomsksoft.notificator;
 
-import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,15 +15,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.net.Authenticator;
-import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -37,13 +26,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 import javax.net.ssl.HttpsURLConnection;
 
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "Login";
+    private static final int TIMEOUT_VALUE = 5000;
+    private boolean alreadyTriedAuthenticating = false;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -53,11 +43,19 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        ((EditText)findViewById(R.id.login)).setText("ntakovoy");
-        ((EditText)findViewById(R.id.password)).setText("aoiwnu91su3");
+        //((EditText)findViewById(R.id.login)).setText("ntakovoy");
+        //((EditText)findViewById(R.id.password)).setText("aoiwnu91su3");
+        final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!sharedPref.getString("login", "login").equals("login"))
+        {
+            ((EditText)findViewById(R.id.login)).setText(sharedPref.getString("login", "login"));
+            ((EditText)findViewById(R.id.password)).setText(sharedPref.getString("password", "password"));
+            onClickLogIn(new View(this));
+        }
     }
 
     @Override
@@ -88,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public Boolean call() throws Exception {
                 return checkLogIn(login, password);
-             //   return false;
+                //   return false;
             }
         });
         executor.shutdown();
@@ -140,17 +138,27 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private boolean checkLogIn(final String userName, final String password) throws IncorrectDataException {
-        URL url = null;
+    private boolean checkLogIn(final String userName, final String password) throws IncorrectDataException
+    {
         try {
-            url = new URL("https://extern.tomsksoft.com/user/note/set/");
+            URL url = new URL("https://extern.tomsksoft.com/user/note/set/");
 
             Authenticator.setDefault(new Authenticator(){
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(userName, password.toCharArray());
+                protected PasswordAuthentication getPasswordAuthentication()
+                {
+                    if (!alreadyTriedAuthenticating)
+                    {
+                        alreadyTriedAuthenticating = true;
+                        return new PasswordAuthentication(userName, password.toCharArray());
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }});
-
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+            connection.setConnectTimeout(TIMEOUT_VALUE);
+            connection.setReadTimeout(TIMEOUT_VALUE);
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setRequestMethod("POST");
@@ -163,19 +171,17 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString("login", userName);
                 editor.putString("password", password);
                 editor.apply();
-
                 return true;
             } else if(rc == 401) {
                 throw new IncorrectDataException(userName + ":" + password);
             }
             connection.disconnect();
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        }
+        catch (SocketTimeoutException e) {
+            System.out.println("More than " + TIMEOUT_VALUE + " elapsed.");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return false;
     }
 
