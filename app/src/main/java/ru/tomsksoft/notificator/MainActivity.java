@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
        String msg = ((TextView)findViewById(R.id.messageField)).getText().toString();
        int day = calendar.get(Calendar.DAY_OF_MONTH);
        int month = calendar.get(Calendar.MONTH);
-       
+
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
         Future<Boolean> result = executor.submit(new Callable<Boolean>() {

@@ -138,13 +138,6 @@ public class LoginActivity extends AppCompatActivity {
             layout.setVisibility(View.VISIBLE);
         }
     }
-
-    public void onClickOpen (View view)
-    {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
-
     private boolean checkLogIn(final String userName, final String password) throws IncorrectDataException
     {
         try {
