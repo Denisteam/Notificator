@@ -7,57 +7,11 @@
     tools:layout_editor_absoluteY="81dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:orientation="horizontal">
-
-        <Spinner
-            android:id="@+id/template_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:entries="@array/templates" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout2"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:text="@string/cause" />
-
-        <Spinner
-            android:id="@+id/causes_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:entries="@array/causes" />
-
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/layout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="0"
         android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:text="@string/additionally" />
 
         <EditText
             android:id="@+id/messageField"
@@ -65,47 +19,69 @@
             android:layout_height="wrap_content"
             android:layout_weight="0"
             android:ems="10"
+            android:hint="@string/new_message"
             android:inputType="textMultiLine"
             tools:ignore="LabelFor" />
+
     </LinearLayout>
 
-
-    <TextView
-        android:id="@+id/time_text"
-        android:layout_width="match_parent"
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="@string/time_of_arrival"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp" />
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/itemTable"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical">
+
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
-        android:id="@+id/linearLayout3"
+        android:id="@+id/layout5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_weight="0"
         android:gravity="bottom"
-        android:orientation="horizontal"
-        android:visibility="visible">
+        android:orientation="horizontal">
 
-        <TimePicker
-            android:id="@+id/timePicker"
-            android:layout_width="match_parent"
-            android:layout_height="88dp"
-            android:layout_weight="1"
-            android:timePickerMode="spinner"
-            android:visibility="visible" />
 
         <Button
-            android:id="@+id/send_message"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:onClick="onClickSendMessage"
-            android:background="@android:color/holo_blue_dark"
-            android:text="@string/send_message_button" />
+            android:id="@+id/button_minus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onClickChangeDate"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/minus" />
 
+        <TextView
+            android:id="@+id/dateField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:text=""
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/blue_grey_900"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/button_plus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onClickChangeDate"
+            android:background="@color/colorPrimaryDark"
+            android:text="@string/plus" />
     </LinearLayout>
 
 </LinearLayout>

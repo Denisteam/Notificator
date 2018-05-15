@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,28 +14,34 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
 
 public class SettingsActivity extends AppCompatActivity
 {
-    AlarmManager am;
-    PendingIntent alarmIntent;
-    boolean changed;
-    TimePicker tp;
-    ToggleButton setAlarmTB;
-    ToggleButton setPenetrationTB;
+    private AlarmManager am;
+    private PendingIntent alarmIntent;
+    private TimePicker tp;
+    private ToggleButton setAlarmTB;
+    private SharedPreferences sharedPref;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -50,21 +57,19 @@ public class SettingsActivity extends AppCompatActivity
         setContentView(R.layout.activity_settings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        changed = false;
+        boolean changed = false;
         am = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        tp = (TimePicker) findViewById(R.id.timePicker);
+        tp = findViewById(R.id.timePicker);
         tp.setIs24HourView(true);
+        sharedPref = getSharedPreferences("settings", Context.MODE_PRIVATE);
 //---------------------------------------------------------------------------------------------------
         final LinearLayout alarmSettingsLayout = findViewById(R.id.alarmSettingsLayout);
         final LinearLayout addAlarmLayout = findViewById(R.id.addAlarmLayout);
 
-        final SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
-
         setAlarmTB = findViewById(R.id.toggleButtonSetAlarm);
-        setPenetrationTB = findViewById(R.id.toggleButtonSetPenetration);
 
         loadAlarmParam();
 //---------------------------------------------------------------------------------------------------
@@ -95,29 +100,6 @@ public class SettingsActivity extends AppCompatActivity
                     alarmSettingsLayout.setVisibility(View.INVISIBLE);
                     addAlarmLayout.setVisibility(View.INVISIBLE);
                     disableAlarm();
-                }
-            }
-        });
-//---------------------------------------------------------------------------------------------------
-        //setPenetrationTB.setChecked(sharedPref.getBoolean("set_Penetration", true));
-        if (setPenetrationTB.isChecked())
-        {
-            setPenetrationTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
-        }
-        else
-            setPenetrationTB.setBackgroundColor(Color.RED);
-
-        setPenetrationTB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                saveAlarmParam();
-                if (isChecked)
-                {
-                    setPenetrationTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
-                }
-                else
-                {
-                    setPenetrationTB.setBackgroundColor(Color.RED);
                 }
             }
         });
@@ -253,7 +235,6 @@ public class SettingsActivity extends AppCompatActivity
 
     private void updateDays()
     {
-        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         for (DayOfWeek dayOfWeek : DayOfWeek.values() ) {
@@ -264,10 +245,8 @@ public class SettingsActivity extends AppCompatActivity
 
     private void saveAlarmParam()
     {
-        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean("set_Alarm", setAlarmTB.isChecked());
-        editor.putBoolean("set_Penetration", setPenetrationTB.isChecked());
         editor.putBoolean(DayOfWeek.MONDAY.toString(), ((CheckBox)findViewById(R.id.checkBox1)).isChecked());
         editor.putBoolean(DayOfWeek.TUESDAY.toString(), ((CheckBox)findViewById(R.id.checkBox2)).isChecked());
         editor.putBoolean(DayOfWeek.WEDNESDAY.toString(), ((CheckBox)findViewById(R.id.checkBox3)).isChecked());
@@ -282,9 +261,7 @@ public class SettingsActivity extends AppCompatActivity
 
     private void loadAlarmParam()
     {
-        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
         setAlarmTB.setChecked(sharedPref.getBoolean("set_Alarm", false));
-        setPenetrationTB.setChecked(sharedPref.getBoolean("set_Penetration", true));
         ((CheckBox)findViewById(R.id.checkBox1)).setChecked(sharedPref.getBoolean(DayOfWeek.MONDAY.toString(), false));
         ((CheckBox)findViewById(R.id.checkBox2)).setChecked(sharedPref.getBoolean(DayOfWeek.TUESDAY.toString(), false));
         ((CheckBox)findViewById(R.id.checkBox3)).setChecked(sharedPref.getBoolean(DayOfWeek.WEDNESDAY.toString(), false));

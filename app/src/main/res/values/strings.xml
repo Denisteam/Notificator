@@ -36,7 +36,7 @@
     <string name="settings">Настройки</string>
     <string name="sending">Отправлено</string>
     <string name="set_notify_timer">Установка времени срабатывания предупреждения</string>
-    <string name="set_alarm">Включить предупреждения  по времени</string>
+    <string name="set_alarm">Включить напоминание по времени</string>
     <string name="i_am_here">Я на месте</string>
     <string name="monday">ПН</string>
     <string name="tuesday">ВТ</string>
@@ -51,100 +51,23 @@
     <string-array name="templates">
         <item>Я на месте</item>
         <item>Я опаздываю</item>
+        <item>Я не приду</item>
     </string-array><string-array name="causes">
-        <item>Без причины</item>
-        <item>Пробка</item>
+        <item>По личной причине</item>
+        <item>В пробке</item>
         <item>Проспал</item>
-        <item>Другое</item>
     </string-array>
-    <string-array name="hours">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>13</item>
-        <item>14</item>
-        <item>15</item>
-        <item>16</item>
-        <item>17</item>
-        <item>18</item>
-        <item>19</item>
-        <item>20</item>
-        <item>21</item>
-        <item>22</item>
-        <item>23</item>
-        <item>24</item>
-    </string-array>
-    <string-array name="minutes">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-        <item>13</item>
-        <item>14</item>
-        <item>15</item>
-        <item>16</item>
-        <item>17</item>
-        <item>18</item>
-        <item>19</item>
-        <item>20</item>
-        <item>21</item>
-        <item>22</item>
-        <item>23</item>
-        <item>24</item>
-        <item>25</item>
-        <item>26</item>
-        <item>27</item>
-        <item>28</item>
-        <item>29</item>
-        <item>30</item>
-        <item>31</item>
-        <item>32</item>
-        <item>33</item>
-        <item>34</item>
-        <item>35</item>
-        <item>36</item>
-        <item>37</item>
-        <item>38</item>
-        <item>39</item>
-        <item>40</item>
-        <item>41</item>
-        <item>42</item>
-        <item>43</item>
-        <item>44</item>
-        <item>45</item>
-        <item>46</item>
-        <item>47</item>
-        <item>48</item>
-        <item>49</item>
-        <item>50</item>
-        <item>51</item>
-        <item>52</item>
-        <item>53</item>
-        <item>54</item>
-        <item>55</item>
-        <item>56</item>
-        <item>57</item>
-        <item>58</item>
-        <item>59</item>
+    <string-array name="time">
+        <item>5 минут</item>
+        <item>10 минут</item>
+        <item>15 минут</item>
+        <item>30 минут</item>
+        <item>45 минут</item>
+        <item>1 час</item>
+        <item>2 часа</item>
+        <item>3 часа</item>
+        <item>5 часов</item>
+        <item>более чем 5 часов</item>
     </string-array>
     <string name="days_of_the_week">Дни срабатывания предупреждения</string>
     <string name="todo">TODO</string>
@@ -162,4 +85,33 @@
     <string name="login">Логин</string>
     <string name="incorrect_data">Введены некорректные данные</string>
     <string name="are_you_sure_to_exit">Вы действительно хотите выйти из учётной записи?</string>
+    <string name="date">Дата</string>
+    <string name="january">января</string>
+    <string name="february">февраля</string>
+    <string name="march">марта</string>
+    <string name="april">апреля</string>
+    <string name="may">мая</string>
+    <string name="june">июня</string>
+    <string name="july">июля</string>
+    <string name="august">августа</string>
+    <string name="september">сентября</string>
+    <string name="october">октября</string>
+    <string name="november">ноября</string>
+    <string name="december">декабря</string>
+    <string name="plus">+</string>
+    <string name="add_cause">Добавить новый шаблон</string>
+    <string name="cause_name">Название шаблона</string>
+    <string name="cause_text">Текст шаблона</string>
+    <string name="cancel">Отмена</string>
+    <string name="add">Добавить</string>
+    <string name="added">Добавлено</string>
+    <string name="null_text">Отсутствует текст</string>
+    <string name="null_cause_name">Отсутствует имя шаблона</string>
+    <string name="edit_causes">Редактировать шаблоны</string>
+    <string name="edit_cause">Изменить шаблон</string>
+    <string name="edit">Изменить</string>
+    <string name="edited">Изменено</string>
+    <string name="delete">Удалить</string>
+    <string name="delited">Удалено</string>
+    <string name="minus">-</string>
 </resources>
