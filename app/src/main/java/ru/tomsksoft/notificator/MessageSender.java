@@ -11,8 +11,6 @@ import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.net.ssl.HttpsURLConnection;
 
@@ -25,12 +23,11 @@ public class MessageSender
     private static final int TIMEOUT_VALUE = 5000;
 
 
-    public static boolean sendMessage(Context context, String time) throws IncorrectDataException
+    public static boolean sendMessage(Context context, String date, String msg) throws IncorrectDataException
     {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
         final String userName = sharedPref.getString("login", "login");
-        final String passvord = sharedPref.getString("password", "password");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final String password = sharedPref.getString("password", "password");
 
         URL url = null;
 
@@ -39,7 +36,7 @@ public class MessageSender
 
             Authenticator.setDefault(new Authenticator(){
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(userName, passvord.toCharArray());
+                    return new PasswordAuthentication(userName, password.toCharArray());
                 }});
 
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -49,8 +46,7 @@ public class MessageSender
             connection.setDoInput(true);
             connection.setRequestMethod("POST");
             connection.getOutputStream().write(("{\"jsonrpc\": \"2.0\", \"method\":" +
-                    " \"notification\", \"params\": {\"type\": 1, \"message\": \"will " +
-                    "be in office at " + time + "\", \"date\": \"" + dateFormat.format(new Date()) + "\", \"remind_at\": " +
+                    " \"notification\", \"params\": {\"type\": 1, \"message\": \"" + msg + "\", \"date\": \"" + date + "\", \"remind_at\": " +
                     "\"2018-03-19 13:15:00\"}, \"id\": 1}").getBytes());
             connection.connect();
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -64,12 +60,10 @@ public class MessageSender
             if (rc == 200) {
                 return true;
             } else if(rc == 401) {
-                throw new IncorrectDataException(userName + ":" + passvord);
+                throw new IncorrectDataException(userName + ":" + password);
             }
             connection.disconnect();
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

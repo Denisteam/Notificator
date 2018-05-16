@@ -172,14 +172,14 @@ public class MainActivity extends AppCompatActivity {
         {
             case R.id.button_plus:
                 calendar.add(Calendar.DAY_OF_MONTH,1);
-                str = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH)+1));
+                str = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + calendar.get(Calendar.MONTH)+1) ;
                 ((TextView)findViewById(R.id.dateField)).setText(str);
                 break;
             case R.id.button_minus:
                 calendar.add(Calendar.DAY_OF_MONTH,-1);
                 if (calendar.before(Calendar.getInstance()) && calendar.get(Calendar.DAY_OF_MONTH) != Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
                     calendar.add(Calendar.DAY_OF_MONTH,+1);
-                str = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH)+1));
+                str = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + calendar.get(Calendar.MONTH)+1);
                 ((TextView)findViewById(R.id.dateField)).setText(str);
                 break;
             default:
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendMessage()
     {
-       String msg = ((TextView)findViewById(R.id.messageField)).getText().toString();
+       final String msg = ((TextView)findViewById(R.id.messageField)).getText().toString();
        int day = calendar.get(Calendar.DAY_OF_MONTH);
        int month = calendar.get(Calendar.MONTH);
 
@@ -199,7 +199,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Boolean call() throws Exception {
                 return MessageSender.sendMessage(MainActivity.this,
-                        String.valueOf(Calendar.getInstance().get(Calendar.HOUR)) + ":" + String.valueOf(Calendar.getInstance().get(Calendar.MINUTE)));
+                        calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + calendar.get(Calendar.MONTH)+1,
+                        msg);
             }
         });
         executor.shutdown();
@@ -263,6 +264,9 @@ public class MainActivity extends AppCompatActivity {
             }
         itemTable.addView(text,0);
         templates.add(text);
+
+        if (itemTable.getChildCount() > 30)
+            itemTable.removeViewAt(itemTable.getChildCount()-1);
     }
 
     private void setStringArray(ArrayList<String> array)
