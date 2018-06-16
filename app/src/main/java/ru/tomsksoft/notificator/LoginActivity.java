@@ -47,8 +47,8 @@ public class LoginActivity extends AppCompatActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        //((EditText)findViewById(R.id.login)).setText("ntakovoy");
-        //((EditText)findViewById(R.id.password)).setText("aoiwnu91su3");
+        ((EditText)findViewById(R.id.login)).setText("ntakovoy");
+        ((EditText)findViewById(R.id.password)).setText("aoiwnu91su3");
         final SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         if (!sharedPref.getString("login", "login").equals("login"))
         {

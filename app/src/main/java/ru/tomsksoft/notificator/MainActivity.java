@@ -32,6 +32,7 @@ import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -59,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private SharedPreferences sharedPref;
-    private static ArrayList<TextView> templates = new ArrayList<>();
-    private static LinearLayout itemTable;
+    private ArrayList<String> templates = new ArrayList<>();
+    private ArrayAdapter<String> listAdapter;
     private static Calendar calendar;
 
     @Override
@@ -110,9 +111,21 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        itemTable = findViewById(R.id.itemTable);
+        ListView listView = findViewById(R.id.list_templates);
+
+        listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, templates);
+        listView.setAdapter(listAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View itemClicked, int position, long id)
+            {
+                ((EditText)findViewById(R.id.messageField)).setText(((TextView) itemClicked).getText());
+            }
+        });
+
+
         calendar = Calendar.getInstance();
-        ((TextView)findViewById(R.id.dateField)).setText(calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH)+1));
+        ((TextView)findViewById(R.id.dateField)).setText(calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + (calendar.get(Calendar.MONTH)+1));
     }
 
     @Override
@@ -172,14 +185,14 @@ public class MainActivity extends AppCompatActivity {
         {
             case R.id.button_plus:
                 calendar.add(Calendar.DAY_OF_MONTH,1);
-                str = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + calendar.get(Calendar.MONTH)+1) ;
+                str = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + (calendar.get(Calendar.MONTH)+1));
                 ((TextView)findViewById(R.id.dateField)).setText(str);
                 break;
             case R.id.button_minus:
                 calendar.add(Calendar.DAY_OF_MONTH,-1);
                 if (calendar.before(Calendar.getInstance()) && calendar.get(Calendar.DAY_OF_MONTH) != Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
                     calendar.add(Calendar.DAY_OF_MONTH,+1);
-                str = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + calendar.get(Calendar.MONTH)+1);
+                str = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + (calendar.get(Calendar.MONTH)+1));
                 ((TextView)findViewById(R.id.dateField)).setText(str);
                 break;
             default:
@@ -215,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
                     if (result.get())
                     {
                         Toast.makeText(MainActivity.this, R.string.sending, Toast.LENGTH_SHORT).show();
-                        addTemplate(((EditText)findViewById(R.id.messageField)).getText().toString());
+                        //addTemplate(((EditText)findViewById(R.id.messageField)).getText().toString());
                     }
                     else
                     {
@@ -235,52 +248,39 @@ public class MainActivity extends AppCompatActivity {
 
     public void addTemplate(String msg)
     {
-        if(!templates.isEmpty() && ((TextView)findViewById(itemTable.getChildAt(0).getId())).getText().equals(msg) )
+        if(!templates.isEmpty() && (templates.get(0).equals(msg)))
             return;
 
-        LinearLayout.LayoutParams lpView = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        TextView text = new TextView(this);
-        lpView.setMargins(0,5,0,5);
-        text.setLayoutParams(lpView);
-        text.setId(View.generateViewId());
-        text.setText(msg);
-        text.setPadding(10,10,5,10);
-        text.setTextSize(15);
-        text.setSelected(true);
-        text.setTextColor(Color.WHITE);
-        text.setBackgroundColor(getResources().getColor(R.color.blue_grey_500));
-        text.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((EditText)findViewById(R.id.messageField)).setText(((TextView)findViewById(v.getId())).getText());
-            }
-        });
-        TextView tv = new TextView(this);
-        for (Iterator<TextView> it = templates.iterator(); it.hasNext(); tv = it.next())
-            if (tv.getText().equals(msg))
-            {
-                itemTable.removeView(tv);
+        String st = "";
+        Iterator<String> it = templates.iterator();
+        while (it.hasNext())
+        {
+            st = it.next();
+            if (st.equals(msg))
                 it.remove();
-            }
-        itemTable.addView(text,0);
-        templates.add(text);
+        }
 
-        if (itemTable.getChildCount() > 30)
-            itemTable.removeViewAt(itemTable.getChildCount()-1);
+        templates.add(0, msg);
+
+        if (templates.size() > 30)
+            templates.remove(templates.size()-1);
+
+        listAdapter.notifyDataSetChanged();
     }
 
     private void setStringArray(ArrayList<String> array)
     {
+        SharedPreferences.Editor editor = sharedPref.edit();
+        StringBuilder str = new StringBuilder();
         if(array != null)
         {
-            SharedPreferences.Editor editor = sharedPref.edit();
-            StringBuilder str = new StringBuilder();
-            for (int i = 0; i < array.size(); i++)
+            for (int i = array.size()-1; i >= 0; i--)
             {
                 str.append(array.get(i)).append(",");
+                System.out.println(array.get(i));
             }
-            editor.putString("Template", str.toString()).apply();
         }
+        editor.putString("Template", str.toString()).apply();
     }
 
     private ArrayList<String> getStringArray()
@@ -294,6 +294,10 @@ public class MainActivity extends AppCompatActivity {
             {
                 array.add(st.nextToken());
             }
+            for (String str: array)
+            {
+                System.out.println(str);
+            }
             return array;
         }
         return new ArrayList<>();
@@ -303,38 +307,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume()
     {
         super.onResume();
-
         ((EditText)findViewById(R.id.messageField)).setText(sharedPref.getString("Message", ""));
-
-        if(templates.isEmpty() && getStringArray().size() > 0)
-        {
-            if(!getStringArray().isEmpty())
-            for (String msg : getStringArray())
-            {
-                addTemplate(msg);
-            }
-        }
+        ArrayList<String> strList = getStringArray();
+        if(templates.isEmpty() && !strList.isEmpty())
+            for (int i = 0; i < strList.size() ; i++)
+                addTemplate(strList.get(i));
     }
 
     @Override
     protected void onPause()
     {
+        super.onPause();
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("Message", ((EditText)findViewById(R.id.messageField)).getText().toString());
 
-        ArrayList<String> tempList = new ArrayList<>();
-        for (int i =  itemTable.getChildCount()-1; i >= 0; i--)
-        {
-            tempList.add(((TextView)itemTable.getChildAt(i)).getText().toString());
-        }
-        setStringArray(tempList);
+        setStringArray(templates);
 
         editor.apply();
 
         templates.clear();
-        itemTable.removeAllViews();
-
-        super.onPause();
     }
 
     @Override
