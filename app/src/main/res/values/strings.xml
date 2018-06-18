@@ -20,6 +20,7 @@
     <string name="preference_file_key">notificator_storage</string>
 
     <string name="phone_number">Номер телефона</string>
+    <string name="settings_storage" translatable="false">settings</string>
     <string name="log_in">Войти</string>
     <string name="log_out">Выйти</string>
     <string name="new_message">Новое сообщение</string>

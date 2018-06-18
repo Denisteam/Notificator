@@ -22,8 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     Context appContext;
 
     @Override
-    public void onReceive(Context context, Intent intent)
-    {
+    public void onReceive(Context context, Intent intent) {
         appContext = context.getApplicationContext();
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(appContext);
@@ -32,13 +31,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         String dayOfWeek = dateFormat.format(date).toUpperCase();
         boolean rightDay = sharedPref.getBoolean(dayOfWeek, false);
 
-
-
-        if (rightDay) { sendNotification("Если вы опаздываете -  оповетите об этом"); }
+        if (rightDay) {
+            sendNotification("Если вы опаздываете -  оповеcтите об этом");
+        }
     }
 
-    private void sendNotification(String messageBody)
-    {
+    private void sendNotification(String messageBody) {
         Intent intent = new Intent(appContext, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(appContext, 0, intent,

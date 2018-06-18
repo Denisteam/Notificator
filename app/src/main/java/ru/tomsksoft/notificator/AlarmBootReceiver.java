@@ -15,10 +15,9 @@ public class AlarmBootReceiver extends BroadcastReceiver {
     PendingIntent alarmIntent;
 
     @Override
-    public void onReceive(Context context, Intent intent)
-    {
+    public void onReceive(Context context, Intent intent) {
         Context appContext = context.getApplicationContext();
-        am = (AlarmManager)appContext.getSystemService(Context.ALARM_SERVICE);
+        am = (AlarmManager) appContext.getSystemService(Context.ALARM_SERVICE);
         Intent target = new Intent(appContext, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(appContext, 0, target, PendingIntent.FLAG_CANCEL_CURRENT);
 
