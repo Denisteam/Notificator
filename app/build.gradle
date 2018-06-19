@@ -26,6 +26,10 @@ android {
         maxProcessCount 1
         javaMaxHeapSize '1200m'
     }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 configurations.all {

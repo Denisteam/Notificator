@@ -85,4 +85,28 @@ public class UserDataStorage {
         Log.d(TAG, "user tamplate: " + tamplate);
         return tamplate;
     }
+
+    public static void refreshToken(Context context, String token) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = preferenc.edit();
+        editor.putString("token", token);
+        editor.putBoolean("refreshed", true);
+        editor.apply();
+    }
+
+    public static boolean isTokenRefreshed(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        return preferenc.getBoolean("refreshed", false);
+    }
+
+    public static String getToken(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        return preferenc.getString("token", null);
+    }
 }

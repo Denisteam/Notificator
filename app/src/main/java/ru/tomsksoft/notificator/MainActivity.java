@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        itemTable = findViewById(R.id.itemTable);
+       // itemTable = findViewById(R.id.itemTable);
         calendar = Calendar.getInstance();
         //TODO(Nikita) Warning: Do not concatenate text displayed with `setText`. Use resource string with placeholders.
         ((TextView) findViewById(R.id.dateField)).setText(calendar.get(Calendar.DAY_OF_MONTH) + "." + (calendar.get(Calendar.MONTH) + 1));

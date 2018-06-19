@@ -1,11 +1,14 @@
 package ru.tomsksoft.notificator;
 
+import android.os.Build;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
+import ru.tomsksoft.notificator.message.Message;
 import ru.tomsksoft.notificator.message.MessageSender;
+import ru.tomsksoft.notificator.message.RPCMethod;
 
 public class InstanceIDService extends FirebaseInstanceIdService {
     private static final String TAG = "MyFirebaseIIDService";
@@ -22,10 +25,8 @@ public class InstanceIDService extends FirebaseInstanceIdService {
 
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
-
-        // Send ID refreshed token to server.
-
-    //    MessageSender.send(getApplicationContext(), ;
+        
+        UserDataStorage.refreshToken(this, refreshedToken);
     }
 
 }
