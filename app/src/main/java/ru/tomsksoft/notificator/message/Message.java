@@ -15,7 +15,7 @@ public class Message {
     private String jsonRPC = "2.0";
     private String method;
     private Map<String, String> params = new LinkedHashMap<>();
-    private long id;
+    private int id;
 
     public Message(Context context, RPCMethod method) {
         this.method = method.name().toLowerCase();
