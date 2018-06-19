@@ -35,6 +35,7 @@ public class MessageSender {
         URL url;
         try {
             url = new URL("https://extern.tomsksoft.com/user/note/set/");
+            //url = new URL("https://google.com");
 
             Authenticator.setDefault(new Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {

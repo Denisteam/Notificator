@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -167,24 +168,28 @@ public class MainActivity extends AppCompatActivity {
 
         try
         {
-            executor.awaitTermination(5, TimeUnit.SECONDS);
+            executor.awaitTermination(3, TimeUnit.SECONDS);
             if (result.isDone())
             {
                 try
                 {
                     if (result.get())
                     {
-                        Toast.makeText(MainActivity.this, R.string.sending, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.sending, Toast.LENGTH_SHORT).show();
                         //addTemplate(((EditText)findViewById(R.id.messageField)).getText().toString());
                     }
                     else
                     {
-                        Toast.makeText(MainActivity.this, R.string.connection_error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.connection_error, Toast.LENGTH_SHORT).show();
                     }
                 } catch (ExecutionException e)
                 {
                     e.printStackTrace();
                 }
+            }
+            else
+            {
+                Toast.makeText(this, R.string.end_wait_time, Toast.LENGTH_LONG).show();
             }
         } catch (InterruptedException e)
         {
@@ -255,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         moveTaskToBack(true);
+        System.exit(0);
         super.onDestroy();
     }
 

@@ -10,13 +10,13 @@ public class UserDataStorage {
 
     private static final String TAG = "USER_DATA_STORAGE";
 
-    public static synchronized int getCurrentMessageId(Context context) {
+    public static synchronized long getCurrentMessageId(Context context) {
         Context appContext = context.getApplicationContext();
         SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-        int id = preference.getInt("current_message_id", 0);
+        long id = preference.getLong("current_message_id", 0L);
 
         SharedPreferences.Editor editor = preference.edit();
-        editor.putInt("current_message_id", id + 1);
+        editor.putLong("current_message_id", id + 1L);
         editor.apply();
 
         Log.d(TAG, "Current id: " + id);

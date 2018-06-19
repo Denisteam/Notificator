@@ -122,6 +122,9 @@ public class LoginActivity extends AppCompatActivity {
                     alertDialog.show();
                 }
             }
+            else
+                Toast.makeText(this, R.string.end_wait_time, Toast.LENGTH_LONG).show();
+
         }
         catch (InterruptedException e)
         {
