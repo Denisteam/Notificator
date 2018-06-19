@@ -3,6 +3,7 @@ package ru.tomsksoft.notificator;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -98,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
+        switch (id)
+        {
             case R.id.settings:
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
@@ -109,13 +111,21 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage(R.string.are_you_sure_to_exit)
                         .setCancelable(false)
                         .setNegativeButton(R.string.no,
-                                (dialog, id1) -> dialog.cancel())
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                })
                         .setPositiveButton(R.string.yes,
-                                (dialog, which) -> {
-                                    UserDataStorage.cleanUserData(MainActivity.this);
-                                    Intent intent1 = new Intent(MainActivity.this, LoginActivity.class);
-                                    startActivity(intent1);
-                                    dialog.cancel();
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which)
+                                    {
+                                        UserDataStorage.cleanUserData(MainActivity.this);
+                                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                        startActivity(intent);
+                                        dialog.cancel();
+                                    }
                                 });
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();

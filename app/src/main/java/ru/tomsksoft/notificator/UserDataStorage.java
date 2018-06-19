@@ -67,6 +67,132 @@ public class UserDataStorage {
         editor.putString("Message", message);
         editor.apply();
     }
+    public static void saveNotificationsCheck(Context context, boolean setNotifications) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = preference.edit();
+        editor.putBoolean("setNotifications", setNotifications);
+        editor.apply();
+
+    }
+
+    public static void saveAlarmParam(Context context, boolean setAlarm, boolean monday, boolean tuesday, boolean wednesday,
+                                      boolean thursday, boolean friday, boolean saturday, boolean sunday, int hour, int minute) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preference.edit();
+        editor.putBoolean("set_Alarm", setAlarm);
+        editor.putBoolean(DayOfWeek.MONDAY.toString(), monday);
+        editor.putBoolean(DayOfWeek.TUESDAY.toString(), tuesday);
+        editor.putBoolean(DayOfWeek.WEDNESDAY.toString(), wednesday);
+        editor.putBoolean(DayOfWeek.THURSDAY.toString(), thursday);
+        editor.putBoolean(DayOfWeek.FRIDAY.toString(), friday);
+        editor.putBoolean(DayOfWeek.SATURDAY.toString(), saturday);
+        editor.putBoolean(DayOfWeek.SUNDAY.toString(), sunday);
+        editor.putInt("hour", hour);
+        editor.putInt("minute", minute);
+        editor.apply();
+    }
+
+    public static boolean getAlarmCheck(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean("set_Alarm", false);
+        Log.d(TAG, "set_Alarm: " + data);
+        return data;
+    }
+
+    public static boolean getMonday(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean(DayOfWeek.MONDAY.toString(), false);
+        Log.d(TAG, "monday: " + data);
+        return data;
+    }
+
+    public static boolean getTuesday(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean(DayOfWeek.TUESDAY.toString(), false);
+        Log.d(TAG, "tuesday: " + data);
+        return data;
+    }
+
+    public static boolean getWednesday(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean(DayOfWeek.WEDNESDAY.toString(), false);
+        Log.d(TAG, "wednesday: " + data);
+        return data;
+    }
+
+    public static boolean getThursday(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean(DayOfWeek.THURSDAY.toString(), false);
+        Log.d(TAG, "thursday: " + data);
+        return data;
+    }
+
+    public static boolean getFriday(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean(DayOfWeek.FRIDAY.toString(), false);
+        Log.d(TAG, "friday: " + data);
+        return data;
+    }
+
+    public static boolean getSaturday(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean(DayOfWeek.SATURDAY.toString(), false);
+        Log.d(TAG, "saturday: " + data);
+        return data;
+    }
+
+    public static boolean getSunday(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean(DayOfWeek.SUNDAY.toString(), false);
+        Log.d(TAG, "sunday: " + data);
+        return data;
+    }
+
+    public static int getHour(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        int data = preference.getInt("hour", 0);
+        Log.d(TAG, "hour: " + data);
+        return data;
+    }
+
+    public static int getMinute(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        int data = preference.getInt("minute", 0);
+        Log.d(TAG, "minute: " + data);
+        return data;
+    }
+
+    public static boolean getNotificationsCheck(Context context) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        boolean data = preference.getBoolean("setNotifications", true);
+        Log.d(TAG, "setNotifications: " + data);
+        return data;
+    }
 
     public static String getMessage(Context context) {
         Context appContext = context.getApplicationContext();

@@ -116,4 +116,5 @@
     <string name="delited">Удалено</string>
     <string name="minus">-</string>
     <string name="end_wait_time">Время ожидания истекло</string>
+    <string name="notifications">Уведомления</string>
 </resources>

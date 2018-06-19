@@ -4,35 +4,23 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 
 
 public class SettingsActivity extends AppCompatActivity
@@ -41,7 +29,7 @@ public class SettingsActivity extends AppCompatActivity
     private PendingIntent alarmIntent;
     private TimePicker tp;
     private ToggleButton setAlarmTB;
-    private SharedPreferences sharedPref;
+    private ToggleButton setNotifTB;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -64,12 +52,13 @@ public class SettingsActivity extends AppCompatActivity
 
         tp = findViewById(R.id.timePicker);
         tp.setIs24HourView(true);
-        sharedPref = getSharedPreferences("settings", Context.MODE_PRIVATE);
 //---------------------------------------------------------------------------------------------------
         final LinearLayout alarmSettingsLayout = findViewById(R.id.alarmSettingsLayout);
         final LinearLayout addAlarmLayout = findViewById(R.id.addAlarmLayout);
 
         setAlarmTB = findViewById(R.id.toggleButtonSetAlarm);
+        setNotifTB = findViewById(R.id.toggleButtonSetNotif);
+        setNotifTB.setChecked(UserDataStorage.getNotificationsCheck(this));
 
         loadAlarmParam();
 //---------------------------------------------------------------------------------------------------
@@ -77,7 +66,6 @@ public class SettingsActivity extends AppCompatActivity
         {
             setAlarmTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
             alarmSettingsLayout.setVisibility(View.VISIBLE);
-            //addAlarmLayout.setVisibility(View.VISIBLE);
         }
         else
             setAlarmTB.setBackgroundColor(Color.RED);
@@ -101,6 +89,25 @@ public class SettingsActivity extends AppCompatActivity
                     addAlarmLayout.setVisibility(View.INVISIBLE);
                     disableAlarm();
                 }
+            }
+        });
+//---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+        if (setNotifTB.isChecked())
+        {
+            setNotifTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
+        }
+        else
+            setNotifTB.setBackgroundColor(Color.RED);
+
+        setNotifTB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    setNotifTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
+                else
+                    setNotifTB.setBackgroundColor(Color.RED);
+                UserDataStorage.saveNotificationsCheck(SettingsActivity.this, isChecked);
             }
         });
 //---------------------------------------------------------------------------------------------------
@@ -131,9 +138,7 @@ public class SettingsActivity extends AppCompatActivity
         int id = item.getItemId();
         if(id == R.id.exit)
         {
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-            final SharedPreferences.Editor editor = sharedPref.edit();
-            if (!sharedPref.getString("login", "login").equals("login"))
+            if (!UserDataStorage.getUserLogin(this).equals("login"))
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
                 builder.setTitle(R.string.alert)
@@ -149,9 +154,7 @@ public class SettingsActivity extends AppCompatActivity
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        editor.putString("login", "login");
-                                        editor.putString("password", "password");
-                                        editor.apply();
+                                        UserDataStorage.cleanUserData(SettingsActivity.this);
                                         Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
                                         startActivity(intent);
                                         dialog.cancel();
@@ -188,18 +191,7 @@ public class SettingsActivity extends AppCompatActivity
 
     public void enableAlarm(int hourOfDay, int minute, boolean[] chek)
     {
-        updateDays();
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
-            editor.putBoolean(dayOfWeek.name(), chek[dayOfWeek.ordinal()]);
-        }
-        editor.putInt("hour", hourOfDay);
-        editor.putInt("minute", minute);
-        editor.apply();
-
+        saveAlarmParam();
 
         Calendar calendar = Calendar.getInstance();
         System.out.println(calendar.getTimeInMillis() + "  " + hourOfDay + "  " + minute);
@@ -221,7 +213,7 @@ public class SettingsActivity extends AppCompatActivity
 
     private void disableAlarm()
     {
-        updateDays();
+        saveAlarmParam();
 
         am.cancel(alarmIntent);
 
@@ -233,44 +225,32 @@ public class SettingsActivity extends AppCompatActivity
                 PackageManager.DONT_KILL_APP);
     }
 
-    private void updateDays()
-    {
-        SharedPreferences.Editor editor = sharedPref.edit();
-
-        for (DayOfWeek dayOfWeek : DayOfWeek.values() ) {
-            editor.putBoolean(dayOfWeek.name(), false);
-        }
-        editor.apply();
-    }
-
     private void saveAlarmParam()
     {
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean("set_Alarm", setAlarmTB.isChecked());
-        editor.putBoolean(DayOfWeek.MONDAY.toString(), ((CheckBox)findViewById(R.id.checkBox1)).isChecked());
-        editor.putBoolean(DayOfWeek.TUESDAY.toString(), ((CheckBox)findViewById(R.id.checkBox2)).isChecked());
-        editor.putBoolean(DayOfWeek.WEDNESDAY.toString(), ((CheckBox)findViewById(R.id.checkBox3)).isChecked());
-        editor.putBoolean(DayOfWeek.THURSDAY.toString(), ((CheckBox)findViewById(R.id.checkBox4)).isChecked());
-        editor.putBoolean(DayOfWeek.FRIDAY.toString(), ((CheckBox)findViewById(R.id.checkBox5)).isChecked());
-        editor.putBoolean(DayOfWeek.SATURDAY.toString(), ((CheckBox)findViewById(R.id.checkBox6)).isChecked());
-        editor.putBoolean(DayOfWeek.SUNDAY.toString(), ((CheckBox)findViewById(R.id.checkBox7)).isChecked());
-        editor.putInt("hour", tp.getCurrentHour());
-        editor.putInt("minute", tp.getCurrentMinute());
-        editor.apply();
+        UserDataStorage.saveAlarmParam(this, setAlarmTB.isChecked(),
+                ((CheckBox)findViewById(R.id.checkBox1)).isChecked(),
+                ((CheckBox)findViewById(R.id.checkBox2)).isChecked(),
+                ((CheckBox)findViewById(R.id.checkBox3)).isChecked(),
+                ((CheckBox)findViewById(R.id.checkBox4)).isChecked(),
+                ((CheckBox)findViewById(R.id.checkBox5)).isChecked(),
+                ((CheckBox)findViewById(R.id.checkBox6)).isChecked(),
+                ((CheckBox)findViewById(R.id.checkBox7)).isChecked(),
+                tp.getCurrentHour(),
+                tp.getCurrentMinute());
     }
 
     private void loadAlarmParam()
     {
-        setAlarmTB.setChecked(sharedPref.getBoolean("set_Alarm", false));
-        ((CheckBox)findViewById(R.id.checkBox1)).setChecked(sharedPref.getBoolean(DayOfWeek.MONDAY.toString(), false));
-        ((CheckBox)findViewById(R.id.checkBox2)).setChecked(sharedPref.getBoolean(DayOfWeek.TUESDAY.toString(), false));
-        ((CheckBox)findViewById(R.id.checkBox3)).setChecked(sharedPref.getBoolean(DayOfWeek.WEDNESDAY.toString(), false));
-        ((CheckBox)findViewById(R.id.checkBox4)).setChecked(sharedPref.getBoolean(DayOfWeek.THURSDAY.toString(), false));
-        ((CheckBox)findViewById(R.id.checkBox5)).setChecked(sharedPref.getBoolean(DayOfWeek.FRIDAY.toString(), false));
-        ((CheckBox)findViewById(R.id.checkBox6)).setChecked(sharedPref.getBoolean(DayOfWeek.SATURDAY.toString(), false));
-        ((CheckBox)findViewById(R.id.checkBox7)).setChecked(sharedPref.getBoolean(DayOfWeek.SUNDAY.toString(), false));
-        tp.setCurrentHour(sharedPref.getInt("hour", 0));
-        tp.setCurrentMinute(sharedPref.getInt("minute", 0));
+        setAlarmTB.setChecked(UserDataStorage.getAlarmCheck(this));
+        ((CheckBox)findViewById(R.id.checkBox1)).setChecked(UserDataStorage.getMonday(this));
+        ((CheckBox)findViewById(R.id.checkBox2)).setChecked(UserDataStorage.getTuesday(this));
+        ((CheckBox)findViewById(R.id.checkBox3)).setChecked(UserDataStorage.getWednesday(this));
+        ((CheckBox)findViewById(R.id.checkBox4)).setChecked(UserDataStorage.getThursday(this));
+        ((CheckBox)findViewById(R.id.checkBox5)).setChecked(UserDataStorage.getFriday(this));
+        ((CheckBox)findViewById(R.id.checkBox6)).setChecked(UserDataStorage.getSaturday(this));
+        ((CheckBox)findViewById(R.id.checkBox7)).setChecked(UserDataStorage.getSunday(this));
+        tp.setCurrentHour(UserDataStorage.getHour(this));
+        tp.setCurrentMinute(UserDataStorage.getMinute(this));
     }
 
     @Override
@@ -283,8 +263,7 @@ public class SettingsActivity extends AppCompatActivity
 
         Intent intent;
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        if (sharedPref.getString("login", "login").equals("login"))
+        if (UserDataStorage.getUserLogin(this).equals("login"))
             intent = new Intent(SettingsActivity.this, LoginActivity.class);
         else
             intent = new Intent(SettingsActivity.this, MainActivity.class);
