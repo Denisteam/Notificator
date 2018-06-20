@@ -25,8 +25,17 @@ public class InstanceIDService extends FirebaseInstanceIdService {
 
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
-        
+
         UserDataStorage.refreshToken(this, refreshedToken);
+        Message message = new Message(this, RPCMethod.TOKEN_ADD);
+        message.addParam("token", UserDataStorage.getToken(this));
+        message.addParam("model", Build.MANUFACTURER + " " + Build.MODEL);
+        message.addParam("os", Build.VERSION.RELEASE);
+        try {
+            MessageSender.send(this, message);
+        } catch (IncorrectDataException e) {
+            e.printStackTrace();
+        }
     }
 
 }

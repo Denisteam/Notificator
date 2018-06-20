@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.util.Calendar;
 
 public class AlarmBootReceiver extends BroadcastReceiver {
+    private static final String TAG = "ALARM_BOOT_RECEIVER";
+
     AlarmManager am;
     PendingIntent alarmIntent;
 
@@ -21,11 +24,12 @@ public class AlarmBootReceiver extends BroadcastReceiver {
         Intent target = new Intent(appContext, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(appContext, 0, target, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(appContext);
-        int hourOfDay = sharedPref.getInt("hour", -1);
-        int minute = sharedPref.getInt("minute", -1);
+        // SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(appContext);
+        int hourOfDay = UserDataStorage.getHour(context);//sharedPref.getInt("hour", -1);
+        int minute = UserDataStorage.getMinute(context);// sharedPref.getInt("minute", -1);
 
         if (minute == -1 || hourOfDay == -1) {
+            Log.e(TAG, "time is empty");
             return;
         }
 

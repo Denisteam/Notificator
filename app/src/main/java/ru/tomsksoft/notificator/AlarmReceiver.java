@@ -23,13 +23,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        appContext = context.getApplicationContext();
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(appContext);
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", Locale.ENGLISH);
         Date date = new Date();
         String dayOfWeek = dateFormat.format(date).toUpperCase();
-        boolean rightDay = sharedPref.getBoolean(dayOfWeek, false);
+        boolean rightDay = UserDataStorage.isDayOfWeekSet(context, dayOfWeek);
 
         if (rightDay) {
             sendNotification("Если вы опаздываете -  оповеcтите об этом");

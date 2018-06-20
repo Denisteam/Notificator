@@ -59,6 +59,24 @@ public class UserDataStorage {
         editor.apply();
     }
 
+    public static void saveUserLogin(Context context, String login) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = preferenc.edit();
+        editor.putString("login", login);
+        editor.apply();
+    }
+
+    public static void saveUserPassword(Context context, String password) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = preferenc.edit();
+        editor.putString("password", password);
+        editor.apply();
+    }
+
     public static void saveMessage(Context context, String message) {
         Context appContext = context.getApplicationContext();
         SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
@@ -82,6 +100,7 @@ public class UserDataStorage {
         Context appContext = context.getApplicationContext();
         SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preference.edit();
+        //TODO: What set_alarm is mean??
         editor.putBoolean("set_Alarm", setAlarm);
         editor.putBoolean(DayOfWeek.MONDAY.toString(), monday);
         editor.putBoolean(DayOfWeek.TUESDAY.toString(), tuesday);
@@ -93,6 +112,13 @@ public class UserDataStorage {
         editor.putInt("hour", hour);
         editor.putInt("minute", minute);
         editor.apply();
+    }
+
+    public static boolean isDayOfWeekSet(Context context, String dayOfWeek) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        return preference.getBoolean(dayOfWeek, false);
     }
 
     public static boolean getAlarmCheck(Context context) {
@@ -171,7 +197,7 @@ public class UserDataStorage {
         Context appContext = context.getApplicationContext();
         SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
 
-        int data = preference.getInt("hour", 0);
+        int data = preference.getInt("hour", -1);
         Log.d(TAG, "hour: " + data);
         return data;
     }
@@ -180,7 +206,7 @@ public class UserDataStorage {
         Context appContext = context.getApplicationContext();
         SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
 
-        int data = preference.getInt("minute", 0);
+        int data = preference.getInt("minute", -1);
         Log.d(TAG, "minute: " + data);
         return data;
     }
@@ -227,6 +253,15 @@ public class UserDataStorage {
         SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
 
         return preferenc.getBoolean("refreshed", false);
+    }
+
+    public static void setTokenRefreshed(Context context, boolean refreshed) {
+        Context appContext = context.getApplicationContext();
+        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = preferenc.edit();
+        editor.putBoolean("refreshed", refreshed);
+        editor.apply();
     }
 
     public static String getToken(Context context) {

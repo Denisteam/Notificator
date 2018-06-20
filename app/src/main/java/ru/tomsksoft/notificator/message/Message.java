@@ -25,6 +25,10 @@ public class Message {
     public void addParam(String k, String v) {
         params.put(k, v);
     }
+
+    public String getMethod() {
+        return method;
+    }
 }
 
 
