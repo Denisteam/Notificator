@@ -4,270 +4,163 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import ru.tomsksoft.notificator.alarm.DayOfWeek;
 
 public class UserDataStorage {
-
+    private SharedPreferences preferences;
     private static final String TAG = "USER_DATA_STORAGE";
+
+    private static final String DAYS_OF_WEEK = "days_of_week";
+    private static final String CURRENT_MESSAGE_ID = "current_message_id";
+    private static final String TEMPLATE = "template";
+    private static final String TOKEN = "token";
+    private static final String REFRESHED = "refreshed";
+    private static final String MESSAGE = "message";
+    private static final String HOUR = "hour";
+    private static final String MINUTE = "minute";
+    private static final String SET_NOTIFICATION = "set_notifications";
+    private static final String SET_ALARM = "set_alarm";
+    private static final String AUTH_DATA = "auth_data";
+
+    public UserDataStorage(Context context) {
+        Context appContext = context.getApplicationContext();
+        preferences = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+    }
 
     public static synchronized long getCurrentMessageId(Context context) {
         Context appContext = context.getApplicationContext();
         SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-        long id = preference.getLong("current_message_id", 0L);
+        long id = preference.getLong(CURRENT_MESSAGE_ID, 0L);
 
         SharedPreferences.Editor editor = preference.edit();
-        editor.putLong("current_message_id", id + 1L);
+        editor.putLong(CURRENT_MESSAGE_ID, id + 1L);
         editor.apply();
 
         Log.d(TAG, "Current id: " + id);
         return id;
     }
 
-    public static void cleanUserData(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+    public void saveUserAuthData(String login, String password) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AUTH_DATA, login + ":" + password);
+        editor.apply();
+    }
 
-        SharedPreferences.Editor editor = preferenc.edit();
-        editor.putString("login", "login");
-        editor.putString("password", "password");
-        editor.putString("Message", "");
+    public String[] getUserAuthData() {
+        String tmp = preferences.getString(AUTH_DATA, "login:password");
+        return tmp.split(":");
+    }
+
+    public void cleanUserData() {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(AUTH_DATA);
+        editor.remove(MESSAGE);
+        editor.remove(TEMPLATE);
         editor.putString("Date", "");
-        editor.putString("Template", "");
         editor.apply();
     }
 
-    public static String getUserLogin(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+    public void saveUserTamplate(List<String> tamplates) {
+        LinkedHashSet set = new LinkedHashSet();
+        for (String str: tamplates) {
+            set.add(str);
+        }
 
-        return preferenc.getString("login", "login");
-    }
-
-    public static String getUserPassword(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        return preferenc.getString("password", "password");
-    }
-
-    public static void saveUserTamplate(Context context, String tamplate) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = preferenc.edit();
-        editor.putString("Template", tamplate);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putStringSet(TEMPLATE, set);
         editor.apply();
     }
 
-    public static void saveUserLogin(Context context, String login) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = preferenc.edit();
-        editor.putString("login", login);
-        editor.apply();
-    }
-
-    public static void saveUserPassword(Context context, String password) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = preferenc.edit();
-        editor.putString("password", password);
-        editor.apply();
-    }
-
-    public static void saveMessage(Context context, String message) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = preferenc.edit();
-        editor.putString("Message", message);
-        editor.apply();
-    }
-    public static void saveNotificationsCheck(Context context, boolean setNotifications) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = preference.edit();
-        editor.putBoolean("setNotifications", setNotifications);
-        editor.apply();
-
-    }
-
-    public static void saveAlarmParam(Context context, boolean setAlarm, boolean monday, boolean tuesday, boolean wednesday,
-                                      boolean thursday, boolean friday, boolean saturday, boolean sunday, int hour, int minute) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preference.edit();
-        //TODO: What set_alarm is mean??
-        editor.putBoolean("set_Alarm", setAlarm);
-        editor.putBoolean(DayOfWeek.MONDAY.toString(), monday);
-        editor.putBoolean(DayOfWeek.TUESDAY.toString(), tuesday);
-        editor.putBoolean(DayOfWeek.WEDNESDAY.toString(), wednesday);
-        editor.putBoolean(DayOfWeek.THURSDAY.toString(), thursday);
-        editor.putBoolean(DayOfWeek.FRIDAY.toString(), friday);
-        editor.putBoolean(DayOfWeek.SATURDAY.toString(), saturday);
-        editor.putBoolean(DayOfWeek.SUNDAY.toString(), sunday);
-        editor.putInt("hour", hour);
-        editor.putInt("minute", minute);
-        editor.apply();
-    }
-
-    public static boolean isDayOfWeekSet(Context context, String dayOfWeek) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        return preference.getBoolean(dayOfWeek, false);
-    }
-
-    public static boolean getAlarmCheck(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean("set_Alarm", false);
-        Log.d(TAG, "set_Alarm: " + data);
-        return data;
-    }
-
-    public static boolean getMonday(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean(DayOfWeek.MONDAY.toString(), false);
-        Log.d(TAG, "monday: " + data);
-        return data;
-    }
-
-    public static boolean getTuesday(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean(DayOfWeek.TUESDAY.toString(), false);
-        Log.d(TAG, "tuesday: " + data);
-        return data;
-    }
-
-    public static boolean getWednesday(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean(DayOfWeek.WEDNESDAY.toString(), false);
-        Log.d(TAG, "wednesday: " + data);
-        return data;
-    }
-
-    public static boolean getThursday(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean(DayOfWeek.THURSDAY.toString(), false);
-        Log.d(TAG, "thursday: " + data);
-        return data;
-    }
-
-    public static boolean getFriday(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean(DayOfWeek.FRIDAY.toString(), false);
-        Log.d(TAG, "friday: " + data);
-        return data;
-    }
-
-    public static boolean getSaturday(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean(DayOfWeek.SATURDAY.toString(), false);
-        Log.d(TAG, "saturday: " + data);
-        return data;
-    }
-
-    public static boolean getSunday(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean(DayOfWeek.SUNDAY.toString(), false);
-        Log.d(TAG, "sunday: " + data);
-        return data;
-    }
-
-    public static int getHour(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        int data = preference.getInt("hour", -1);
-        Log.d(TAG, "hour: " + data);
-        return data;
-    }
-
-    public static int getMinute(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        int data = preference.getInt("minute", -1);
-        Log.d(TAG, "minute: " + data);
-        return data;
-    }
-
-    public static boolean getNotificationsCheck(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preference = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        boolean data = preference.getBoolean("setNotifications", true);
-        Log.d(TAG, "setNotifications: " + data);
-        return data;
-    }
-
-    public static String getMessage(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        String message = preferenc.getString("Message", "");
-        Log.d(TAG, "message: " + message);
-        return message;
-    }
-
-    public static String getUserTamplate(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        String tamplate = preferenc.getString("Template", null);
+    public Set<String> getUserTamplate() {
+        Set<String> tamplate = preferences.getStringSet(TEMPLATE, null);
         Log.d(TAG, "user tamplate: " + tamplate);
         return tamplate;
     }
 
-    public static void refreshToken(Context context, String token) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = preferenc.edit();
-        editor.putString("token", token);
-        editor.putBoolean("refreshed", true);
+    public void saveMessage(String message) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(MESSAGE, message);
         editor.apply();
     }
 
-    public static boolean isTokenRefreshed(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        return preferenc.getBoolean("refreshed", false);
+    public String getMessage() {
+        String message = preferences.getString(MESSAGE, "");
+        Log.d(TAG, "message: " + message);
+        return message;
     }
 
-    public static void setTokenRefreshed(Context context, boolean refreshed) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = preferenc.edit();
-        editor.putBoolean("refreshed", refreshed);
+    public void saveNotificationsCheck(boolean setNotifications) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(SET_NOTIFICATION, setNotifications);
         editor.apply();
     }
 
-    public static String getToken(Context context) {
-        Context appContext = context.getApplicationContext();
-        SharedPreferences preferenc = appContext.getSharedPreferences(appContext.getString(R.string.settings_storage), Context.MODE_PRIVATE);
+    public boolean getNotificationsCheck() {
+        boolean data = preferences.getBoolean(SET_NOTIFICATION, true);
+        Log.d(TAG, "setNotifications: " + data);
+        return data;
+    }
 
-        return preferenc.getString("token", null);
+    public void saveAlarmParam(boolean setAlarm, int mask, int hour, int minute) {
+        SharedPreferences.Editor editor = preferences.edit();
+        //TODO: What set_alarm is mean??
+        Log.d(TAG, Integer.toString(mask));
+        editor.putBoolean(SET_ALARM, setAlarm);
+        editor.putInt(DAYS_OF_WEEK, mask);
+        editor.putInt(HOUR, hour);
+        editor.putInt(MINUTE, minute);
+        editor.apply();
+    }
+
+    public boolean isDayOfWeekSet(DayOfWeek dayOfWeek) {
+        return (preferences.getInt(DAYS_OF_WEEK, 0) & dayOfWeek.getValue()) > 0;
+    }
+
+    public int loadDaysOfWeekSet() {
+        return preferences.getInt(DAYS_OF_WEEK, 0);
+    }
+
+    public boolean getAlarmCheck() {
+        boolean data = preferences.getBoolean(SET_ALARM, false);
+        Log.d(TAG, "set_Alarm: " + data);
+        return data;
+    }
+
+    public int getHour() {
+        int data = preferences.getInt(HOUR, -1);
+        Log.d(TAG, "hour: " + data);
+        return data;
+    }
+
+    public int getMinute() {
+        int data = preferences.getInt(MINUTE, -1);
+        Log.d(TAG, "minute: " + data);
+        return data;
+    }
+
+    public void refreshToken(String token) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(TOKEN, token);
+        editor.putBoolean(REFRESHED, true);
+        editor.apply();
+    }
+
+    public String getToken() {
+        return preferences.getString(TOKEN, null);
+    }
+
+    public boolean isTokenRefreshed() {
+        return preferences.getBoolean(REFRESHED, false);
+    }
+
+    public void setTokenRefreshed(boolean refreshed) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(REFRESHED, refreshed);
+        editor.apply();
     }
 }

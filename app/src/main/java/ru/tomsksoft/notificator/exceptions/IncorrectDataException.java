@@ -1,4 +1,4 @@
-package ru.tomsksoft.notificator;
+package ru.tomsksoft.notificator.exceptions;
 
 import android.util.Log;
 

@@ -51,10 +51,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AlarmTuner"/>
-
         <receiver
-            android:name=".AlarmBootReceiver"
+            android:name=".alarm.AlarmBootReceiver"
             android:enabled="false">
 
             <intent-filter>
@@ -63,7 +61,7 @@
 
         </receiver>
 
-        <receiver android:name=".AlarmReceiver"/>
+        <receiver android:name=".alarm.AlarmReceiver"/>
 
         <service
             android:name=".MessagingService">

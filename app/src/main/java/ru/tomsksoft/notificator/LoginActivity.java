@@ -30,13 +30,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
 import ru.tomsksoft.notificator.message.MessageSender;
 
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LOGIN_ACTIVITY";
-    private static final int TIMEOUT_VALUE = 5000;
-    private boolean alreadyTriedAuthenticating = false;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -51,13 +50,15 @@ public class LoginActivity extends AppCompatActivity {
         ((EditText) findViewById(R.id.login)).setText("ntakovoy");
         ((EditText) findViewById(R.id.password)).setText("aoiwnu91su3");
 
-        String login = UserDataStorage.getUserLogin(this);
-        String password = UserDataStorage.getUserPassword(this);
+        String[] authData = new UserDataStorage(this).getUserAuthData();
+        String login = authData[0];
+        String password = authData[1];
 
         if (!login.equals("login")) {
             ((EditText) findViewById(R.id.login)).setText(login);
             ((EditText) findViewById(R.id.password)).setText(password);
 
+            //он у тебя просто вызывается, без какого-либо нажатия, при чем тут onClick?
             onClickLogIn(new View(this));
         }
     }
@@ -82,22 +83,8 @@ public class LoginActivity extends AppCompatActivity {
         LinearLayout layout = findViewById(R.id.log_in_layout);
         layout.setVisibility(View.INVISIBLE);
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-
-        Future<Boolean> result = executor.submit(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return MessageSender.checkLogIn(LoginActivity.this, login, password);
-                //   return false;
-            }
-        });
-        executor.shutdown();
-
         try {
-            executor.awaitTermination(5, TimeUnit.SECONDS);
-            if (result.isDone()) {
-                boolean res = result.get();
-                Log.d(TAG, "connecting result: " + String.valueOf(res));
+            boolean res = MessageSender.checkLogIn(LoginActivity.this, login, password);
                 if (res) {
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
@@ -118,30 +105,16 @@ public class LoginActivity extends AppCompatActivity {
                     AlertDialog alertDialog = builder.create();
                     alertDialog.show();
                 }
-            } else
-                Toast.makeText(this, R.string.end_wait_time, Toast.LENGTH_LONG).show();
-
         } catch (InterruptedException e) {
             e.printStackTrace();
             pb.setVisibility(View.INVISIBLE);
             layout.setVisibility(View.VISIBLE);
-        } catch (ExecutionException e) {
+        } catch (IncorrectDataException e) {
             Log.d(TAG, "incorrect data: " + e.getMessage());
             Toast.makeText(LoginActivity.this, R.string.incorrect_data, Toast.LENGTH_LONG).show();
-            alreadyTriedAuthenticating = false;
             pb.setVisibility(View.INVISIBLE);
             layout.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        moveTaskToBack(true);
-
-        super.onDestroy();
-
-        System.runFinalizersOnExit(true);
-        System.exit(0);
     }
 }
 
