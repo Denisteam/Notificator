@@ -9,14 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import ru.tomsksoft.notificator.LoginActivity;
-import ru.tomsksoft.notificator.MainActivity;
+import ru.tomsksoft.notificator.UI.LoginActivity;
 import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserDataStorage;
 

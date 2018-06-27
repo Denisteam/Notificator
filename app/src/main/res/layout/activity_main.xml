@@ -46,8 +46,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="onClickChangeDate"
             android:background="@color/colorPrimaryDark"
+            android:onClick="onClickChangeDate"
             android:text="@string/minus" />
 
         <TextView
@@ -61,7 +61,7 @@
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/blue_grey_900"
-            android:textSize="30sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
         <Button
@@ -69,8 +69,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:onClick="onClickChangeDate"
             android:background="@color/colorPrimaryDark"
+            android:onClick="onClickChangeDate"
             android:text="@string/plus" />
     </LinearLayout>
 

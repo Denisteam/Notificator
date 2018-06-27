@@ -65,21 +65,17 @@ public class UserDataStorage {
         editor.apply();
     }
 
-    public void saveUserTamplate(List<String> tamplates) {
-        LinkedHashSet set = new LinkedHashSet();
-        for (String str: tamplates) {
-            set.add(str);
-        }
-
+    public void saveUserTemplate(String template) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putStringSet(TEMPLATE, set);
+        Log.d(TAG, "user template: " + template);
+        editor.putString(TEMPLATE, template);
         editor.apply();
     }
 
-    public Set<String> getUserTamplate() {
-        Set<String> tamplate = preferences.getStringSet(TEMPLATE, null);
-        Log.d(TAG, "user tamplate: " + tamplate);
-        return tamplate;
+    public String getUserTemplate() {
+        String template = preferences.getString(TEMPLATE, null);
+        Log.d(TAG, "user template: " + template);
+        return template;
     }
 
     public void saveMessage(String message) {
@@ -108,7 +104,6 @@ public class UserDataStorage {
 
     public void saveAlarmParam(boolean setAlarm, int mask, int hour, int minute) {
         SharedPreferences.Editor editor = preferences.edit();
-        //TODO: What set_alarm is mean??
         Log.d(TAG, Integer.toString(mask));
         editor.putBoolean(SET_ALARM, setAlarm);
         editor.putInt(DAYS_OF_WEEK, mask);

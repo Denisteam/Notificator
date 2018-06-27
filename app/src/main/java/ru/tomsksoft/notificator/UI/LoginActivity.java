@@ -1,10 +1,8 @@
-package ru.tomsksoft.notificator;
+package ru.tomsksoft.notificator.UI;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,20 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.HttpsURLConnection;
-
+import ru.tomsksoft.notificator.R;
+import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
 import ru.tomsksoft.notificator.message.MessageSender;
 
@@ -58,8 +44,7 @@ public class LoginActivity extends AppCompatActivity {
             ((EditText) findViewById(R.id.login)).setText(login);
             ((EditText) findViewById(R.id.password)).setText(password);
 
-            //он у тебя просто вызывается, без какого-либо нажатия, при чем тут onClick?
-            onClickLogIn(new View(this));
+            login();
         }
     }
 
@@ -74,7 +59,12 @@ public class LoginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onClickLogIn(View view) {
+    public void onClickLogIn(View view)
+    {
+        login();
+    }
+    private void login()
+    {
         final String login = ((EditText) findViewById(R.id.login)).getText().toString();
         final String password = ((EditText) findViewById(R.id.password)).getText().toString();
 
@@ -87,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
             boolean res = MessageSender.checkLogIn(LoginActivity.this, login, password);
                 if (res) {
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
                     Log.d(TAG, "Too long waiting");
@@ -117,4 +108,3 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 }
-

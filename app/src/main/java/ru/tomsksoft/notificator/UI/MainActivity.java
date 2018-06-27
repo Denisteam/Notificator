@@ -1,4 +1,4 @@
-package ru.tomsksoft.notificator;
+package ru.tomsksoft.notificator.UI;
 
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
@@ -6,7 +6,6 @@ import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,9 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,17 +26,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
+
+import ru.tomsksoft.notificator.R;
+import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
 import ru.tomsksoft.notificator.message.Message;
 import ru.tomsksoft.notificator.message.MessageSender;
@@ -95,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
            }
         });
         calendar = Calendar.getInstance();
-
-        ((TextView)findViewById(R.id.dateField)).setText(calendar.get(Calendar.DAY_OF_MONTH) + "." + (((calendar.get(Calendar.MONTH)+1) > 9) ? "" : "0") + (calendar.get(Calendar.MONTH)+1));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM");
+        ((TextView)findViewById(R.id.dateField)).setText(dateFormat.format(calendar.getTime()));
     }
 
     @Override
@@ -125,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                                     {
                                         new UserDataStorage(MainActivity.this).cleanUserData();
                                         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                         startActivity(intent);
                                         dialog.cancel();
                                     }
@@ -132,12 +126,11 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
                 return true;
-                //TODO(Nikita): "отправить" это не item, а button. Исправь, сделай кнопку неактивной,
-                //пока в текстовом поле не появится текст(няльзя отправлять пустую строку)
-                //для этого к текстовому полю следует добавить onChangeListener или типо того
-                //и там, если кол-во символов больше 0 делаем кнопку активной
             case R.id.send_message:
-                sendMessage();
+                if (((EditText)findViewById(R.id.messageField)).getText().toString().isEmpty())
+                    Toast.makeText(this, R.string.null_text, Toast.LENGTH_SHORT).show();
+                else
+                    sendMessage();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -146,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickChangeDate(View view) {
         String str;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM", Locale.ENGLISH);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM");
         switch (view.getId()) {
             case R.id.button_plus:
                 calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -186,9 +179,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, R.string.connection_error, Toast.LENGTH_SHORT).show();
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IncorrectDataException e) {
+        } catch (InterruptedException | IncorrectDataException e) {
             e.printStackTrace();
         }
         addTemplate(((EditText)findViewById(R.id.messageField)).getText().toString());
@@ -197,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
     //
     public void addTemplate(String msg) {
-        if(templates.contains(msg)) {
+        if(!templates.isEmpty() && (templates.get(0).equals(msg))) {
             return;
         }
 
@@ -209,29 +200,48 @@ public class MainActivity extends AppCompatActivity {
                 it.remove();
         }
 
-        templates.add(msg);
+        templates.add(0, msg);
 
         if (templates.size() > 30)
             templates.remove(templates.size()-1);
 
        listAdapter.notifyDataSetChanged();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = templates.size() - 1; i >= 0; i--)
+            sb.append(templates.get(i)).append(",");
+        new UserDataStorage(MainActivity.this).saveUserTemplate(sb.toString());
+    }
+
+    private ArrayList<String> getStringArray()
+    {
+        String savedString = new UserDataStorage(MainActivity.this).getUserTemplate();
+        if (savedString != null && !TextUtils.isEmpty(savedString))
+        {
+            StringTokenizer st = new StringTokenizer(savedString, ",");
+            ArrayList<String> array = new ArrayList<String>(st.countTokens());
+            while(st.hasMoreTokens())
+                array.add(st.nextToken());
+            return array;
+        }
+        return new ArrayList<>();
     }
 
     @Override
     protected void onResume() {
+        ((EditText)findViewById(R.id.messageField)).setText(new UserDataStorage(this).getMessage());
+        ArrayList<String> strList = getStringArray();
+        if(templates.isEmpty() && !strList.isEmpty())
+            for (int i = 0; i < strList.size() ; i++)
+                addTemplate(strList.get(i));
         super.onResume();
-        //сохранять данные из текстовых полей на паузе такое себе
-
-     /*   ((EditText)findViewById(R.id.messageField)).setText(new UserDataStorage(this).getMessage());
-        Set<String> strSet = new UserDataStorage(this).getUserTamplate();
-       for(String str: strSet) {
-           addTemplate(str);
-       }*/
     }
 
     @Override
     protected void onPause() {
+        new UserDataStorage(MainActivity.this).saveMessage(((EditText) findViewById(R.id.messageField)).getText().toString());
         super.onPause();
     }
+
 }
 

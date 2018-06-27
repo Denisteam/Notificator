@@ -1,4 +1,4 @@
-package ru.tomsksoft.notificator;
+package ru.tomsksoft.notificator.UI;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -22,6 +22,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import java.util.Calendar;
 
+import ru.tomsksoft.notificator.R;
+import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.alarm.AlarmBootReceiver;
 import ru.tomsksoft.notificator.alarm.AlarmReceiver;
 import ru.tomsksoft.notificator.alarm.DayOfWeek;
@@ -292,9 +294,14 @@ public class SettingsActivity extends AppCompatActivity
         Intent intent;
 
         if (new UserDataStorage(this).getUserAuthData()[0].equals("login"))
+        {
             intent = new Intent(SettingsActivity.this, LoginActivity.class);
+        }
         else
+        {
             intent = new Intent(SettingsActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
         startActivity(intent);
 
         //super.onBackPressed();
