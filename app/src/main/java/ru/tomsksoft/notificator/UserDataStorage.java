@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -15,6 +16,9 @@ public class UserDataStorage {
     private SharedPreferences preferences;
     private static final String TAG = "USER_DATA_STORAGE";
 
+    private static final String TIME = "time";
+    private static final String LOGIN = "login";
+    private static final String PASSWORD = "password";
     private static final String DAYS_OF_WEEK = "days_of_week";
     private static final String CURRENT_MESSAGE_ID = "current_message_id";
     private static final String TEMPLATE = "template";
@@ -45,15 +49,18 @@ public class UserDataStorage {
         return id;
     }
 
-    public void saveUserAuthData(String login, String password) {
+    public void saveUserAuthData(UserCreditans creditans) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(AUTH_DATA, login + ":" + password);
+        editor.putString("login", creditans.getLogin());
+        editor.putString("password", creditans.getPassword());
         editor.apply();
     }
 
-    public String[] getUserAuthData() {
-        String tmp = preferences.getString(AUTH_DATA, "login:password");
-        return tmp.split(":");
+    public UserCreditans getUserAuthData() {
+        String login = preferences.getString("login", "login");
+        String password = preferences.getString("password", "password");
+
+        return new UserCreditans(login, password);
     }
 
     public void cleanUserData() {
@@ -102,11 +109,11 @@ public class UserDataStorage {
         return data;
     }
 
-    public void saveAlarmParam(boolean setAlarm, int mask, int hour, int minute) {
+    public void saveAlarmParam(boolean setAlarm, Set<DayOfWeek> dayOfWeeks, int hour, int minute) {
         SharedPreferences.Editor editor = preferences.edit();
-        Log.d(TAG, Integer.toString(mask));
+        Log.d(TAG, Integer.toString(DayOfWeek.getMaskByDayOfWeekList(dayOfWeeks)));
         editor.putBoolean(SET_ALARM, setAlarm);
-        editor.putInt(DAYS_OF_WEEK, mask);
+        editor.putInt(DAYS_OF_WEEK, DayOfWeek.getMaskByDayOfWeekList(dayOfWeeks));
         editor.putInt(HOUR, hour);
         editor.putInt(MINUTE, minute);
         editor.apply();
@@ -116,8 +123,8 @@ public class UserDataStorage {
         return (preferences.getInt(DAYS_OF_WEEK, 0) & dayOfWeek.getValue()) > 0;
     }
 
-    public int loadDaysOfWeekSet() {
-        return preferences.getInt(DAYS_OF_WEEK, 0);
+    public Set<DayOfWeek> loadDaysOfWeekSet() {
+        return DayOfWeek.getListOfDayOfWeekByMask(preferences.getInt(DAYS_OF_WEEK, 0));
     }
 
     public boolean getAlarmCheck() {
@@ -125,17 +132,12 @@ public class UserDataStorage {
         Log.d(TAG, "set_Alarm: " + data);
         return data;
     }
-
-    public int getHour() {
-        int data = preferences.getInt(HOUR, -1);
-        Log.d(TAG, "hour: " + data);
-        return data;
-    }
-
-    public int getMinute() {
-        int data = preferences.getInt(MINUTE, -1);
-        Log.d(TAG, "minute: " + data);
-        return data;
+    
+    public Calendar getTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, preferences.getInt(HOUR, 0));
+        calendar.set(Calendar.MINUTE, preferences.getInt(MINUTE, 0));
+        return calendar;
     }
 
     public void refreshToken(String token) {

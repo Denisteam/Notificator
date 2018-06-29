@@ -21,6 +21,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserDataStorage;
@@ -144,7 +146,7 @@ public class SettingsActivity extends AppCompatActivity
         int id = item.getItemId();
         if(id == R.id.exit)
         {
-            if (!new UserDataStorage(this).getUserAuthData()[0].equals("login"))
+            if (!new UserDataStorage(this).getUserAuthData().getLogin().equals("login"))
             {
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
                 builder.setTitle(R.string.alert)
@@ -233,43 +235,43 @@ public class SettingsActivity extends AppCompatActivity
 
     private void saveAlarmParam()
     {
-        int mask = 0;
+        Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         if (((CheckBox)findViewById(R.id.checkBox1)).isChecked()) {
-            mask |= DayOfWeek.MONDAY.getValue();
+            dayOfWeeks.add(DayOfWeek.MONDAY);
         }
 
         if (((CheckBox)findViewById(R.id.checkBox2)).isChecked()) {
-            mask |= DayOfWeek.TUESDAY.getValue();
+            dayOfWeeks.add(DayOfWeek.TUESDAY);
         }
 
         if (((CheckBox)findViewById(R.id.checkBox3)).isChecked()) {
-            mask |= DayOfWeek.WEDNESDAY.getValue();
+            dayOfWeeks.add(DayOfWeek.WEDNESDAY);
         }
 
         if (((CheckBox)findViewById(R.id.checkBox4)).isChecked()) {
-            mask |= DayOfWeek.THURSDAY.getValue();
+            dayOfWeeks.add(DayOfWeek.THURSDAY);
         }
 
         if (((CheckBox)findViewById(R.id.checkBox5)).isChecked()) {
-            mask |= DayOfWeek.FRIDAY.getValue();
+            dayOfWeeks.add(DayOfWeek.FRIDAY);
         }
 
         if (((CheckBox)findViewById(R.id.checkBox6)).isChecked()) {
-            mask |= DayOfWeek.SATURDAY.getValue();
+            dayOfWeeks.add(DayOfWeek.SATURDAY);
         }
 
         if (((CheckBox)findViewById(R.id.checkBox7)).isChecked()) {
-            mask |= DayOfWeek.SUNDAY.getValue();
+            dayOfWeeks.add(DayOfWeek.SUNDAY);
         }
 
         UserDataStorage dataStorage = new UserDataStorage(this);
-        dataStorage.saveAlarmParam(setAlarmTB.isChecked(), mask, tp.getCurrentHour(), tp.getCurrentMinute());
+        dataStorage.saveAlarmParam(setAlarmTB.isChecked(), dayOfWeeks, tp.getCurrentHour(), tp.getCurrentMinute());
     }
 
     private void loadAlarmParam()
     {
         UserDataStorage dataStorage = new UserDataStorage(this);
-        int mask = dataStorage.loadDaysOfWeekSet();
+        int mask = DayOfWeek.getMaskByDayOfWeekList(dataStorage.loadDaysOfWeekSet());
 
         setAlarmTB.setChecked(dataStorage.getAlarmCheck());
         ((CheckBox)findViewById(R.id.checkBox1)).setChecked(DayOfWeek.MONDAY.isDayOfWeekSet(mask));
@@ -279,8 +281,10 @@ public class SettingsActivity extends AppCompatActivity
         ((CheckBox)findViewById(R.id.checkBox5)).setChecked(DayOfWeek.FRIDAY.isDayOfWeekSet(mask));
         ((CheckBox)findViewById(R.id.checkBox6)).setChecked(DayOfWeek.SATURDAY.isDayOfWeekSet(mask));
         ((CheckBox)findViewById(R.id.checkBox7)).setChecked(DayOfWeek.SUNDAY.isDayOfWeekSet(mask));
-        tp.setCurrentHour(dataStorage.getHour());
-        tp.setCurrentMinute(dataStorage.getMinute());
+
+        Calendar calendar = dataStorage.getTime();
+        tp.setCurrentHour(calendar.get(Calendar.HOUR));
+        tp.setCurrentMinute(calendar.get(Calendar.MINUTE));
     }
 
     @Override
@@ -293,7 +297,7 @@ public class SettingsActivity extends AppCompatActivity
 
         Intent intent;
 
-        if (new UserDataStorage(this).getUserAuthData()[0].equals("login"))
+        if (new UserDataStorage(this).getUserAuthData().getLogin().equals("login"))
         {
             intent = new Intent(SettingsActivity.this, LoginActivity.class);
         }

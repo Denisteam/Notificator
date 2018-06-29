@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import ru.tomsksoft.notificator.R;
+import ru.tomsksoft.notificator.UserCreditans;
 import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
 import ru.tomsksoft.notificator.message.MessageSender;
@@ -36,9 +37,9 @@ public class LoginActivity extends AppCompatActivity {
         ((EditText) findViewById(R.id.login)).setText("ntakovoy");
         ((EditText) findViewById(R.id.password)).setText("aoiwnu91su3");
 
-        String[] authData = new UserDataStorage(this).getUserAuthData();
-        String login = authData[0];
-        String password = authData[1];
+        UserCreditans authData = new UserDataStorage(this).getUserAuthData();
+        String login = authData.getLogin();
+        String password = authData.getPassword();
 
         if (!login.equals("login")) {
             ((EditText) findViewById(R.id.login)).setText(login);

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import ru.tomsksoft.notificator.UserDataStorage;
 
@@ -25,8 +26,9 @@ public class AlarmBootReceiver extends BroadcastReceiver {
         alarmIntent = PendingIntent.getBroadcast(appContext, 0, target, PendingIntent.FLAG_CANCEL_CURRENT);
 
         UserDataStorage dataStorage = new UserDataStorage(context);
-        int hourOfDay = dataStorage.getHour();
-        int minute = dataStorage.getMinute();
+        Calendar tmp = dataStorage.getTime();
+        int hourOfDay = tmp.get(Calendar.HOUR);
+        int minute = tmp.get(Calendar.MINUTE);
 
         if (minute == -1 || hourOfDay == -1) {
             Log.e(TAG, "time is empty");

@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import ru.tomsksoft.notificator.UserCreditans;
 import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
 
@@ -31,9 +32,9 @@ public class MessageSender {
     private static boolean alreadyTriedAuthenticating = false;
 
     public static boolean send(Context context, Message message) throws IncorrectDataException, InterruptedException {
-        String[] authData = new UserDataStorage(context).getUserAuthData();
-        final String userName = authData[0];
-        final String password = authData[1];
+        UserCreditans authData = new UserDataStorage(context).getUserAuthData();
+        final String userName = authData.getLogin();
+        final String password = authData.getPassword();
         alreadyTriedAuthenticating = false;
 
 
@@ -90,7 +91,7 @@ public class MessageSender {
                             Log.d(TAG, "Token successfully refreshed!");
                         } else if (message == null) {
                             UserDataStorage dataStorage = new UserDataStorage(context);
-                            dataStorage.saveUserAuthData(userName, password);
+                            dataStorage.saveUserAuthData(new UserCreditans(userName, password));
                             if (dataStorage.isTokenRefreshed()) {
                                 Message msg = new Message(context, RPCMethod.TOKEN_ADD);
                                 msg.addParam("token", dataStorage.getToken());
@@ -136,7 +137,7 @@ public class MessageSender {
 
     public static boolean checkLogIn(Context context, final String userName, final String password) throws IncorrectDataException, InterruptedException {
         UserDataStorage dataStorage = new UserDataStorage(context);
-        dataStorage.saveUserAuthData(userName, password);
+        dataStorage.saveUserAuthData(new UserCreditans(userName, password));
 
         return send(context, null);
 
