@@ -1,6 +1,9 @@
 package ru.tomsksoft.notificator.UI;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.DialogInterface;
@@ -38,12 +41,14 @@ import ru.tomsksoft.notificator.message.Message;
 import ru.tomsksoft.notificator.message.MessageSender;
 import ru.tomsksoft.notificator.message.RPCMethod;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SettingsFragment.OnClickSettingsListener
+{
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     private static final String TAG = "MainActivity";
     private List<String> templates = new ArrayList<>();
     private ArrayAdapter<String> listAdapter;
     private static Calendar calendar;
+    private FragmentManager fragmentManager;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -87,18 +92,45 @@ public class MainActivity extends AppCompatActivity {
                ((EditText)findViewById(R.id.messageField)).setText(((TextView) itemClicked).getText());
            }
         });
+
+        fragmentManager = getFragmentManager();
+
         calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM");
         ((TextView)findViewById(R.id.dateField)).setText(dateFormat.format(calendar.getTime()));
     }
 
     @Override
+    public void onClick()
+    {
+        backToMain();
+    }
+
+    private void backToMain()
+    {
+        fragmentManager.popBackStack();
+        fragmentManager.beginTransaction()
+                .remove(fragmentManager.findFragmentByTag("settings"))
+                .addToBackStack(null)
+                .commit();
+        findViewById(R.id.layoutMessage).setVisibility(View.VISIBLE);
+        findViewById(R.id.layoutDate).setVisibility(View.VISIBLE);
+    }
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
             case R.id.settings:
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                //startActivity(intent);
+                fragmentManager.popBackStack();
+                Fragment settingsFragment = new SettingsFragment();
+                fragmentManager.beginTransaction()
+                        .add(R.id.container, settingsFragment, "settings")
+                        .addToBackStack(null)
+                        .commit();
+                findViewById(R.id.layoutMessage).setVisibility(View.INVISIBLE);
+                findViewById(R.id.layoutDate).setVisibility(View.INVISIBLE);
                 return true;
             case R.id.exit:
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -117,8 +149,9 @@ public class MainActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog, int which)
                                     {
                                         new UserDataStorage(MainActivity.this).cleanUserData();
+                                        if (findViewById(R.id.layoutMessage).getVisibility() == View.INVISIBLE)
+                                            backToMain();
                                         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                         startActivity(intent);
                                         dialog.cancel();
                                     }
@@ -241,5 +274,36 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (findViewById(R.id.layoutMessage).getVisibility() == View.INVISIBLE)
+            if (((SettingsFragment) fragmentManager.findFragmentByTag("settings")).isChanged())
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(R.string.alert)
+                        .setMessage(R.string.unsaved_settings)
+                        .setCancelable(false)
+                        .setNegativeButton(R.string.no,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                })
+                        .setPositiveButton(R.string.yes,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        backToMain();
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+            else
+                backToMain();
+        else
+            super.onBackPressed();
+    }
 }
 

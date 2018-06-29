@@ -1,6 +1,9 @@
 package ru.tomsksoft.notificator.UI;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -21,8 +24,9 @@ import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
 import ru.tomsksoft.notificator.message.MessageSender;
 
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity implements SettingsFragment.OnClickSettingsListener{
     private static final String TAG = "LOGIN_ACTIVITY";
+    private FragmentManager fragmentManager;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -47,14 +51,23 @@ public class LoginActivity extends AppCompatActivity {
 
             login();
         }
+        fragmentManager = getFragmentManager();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.settings) {
-            Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
-            startActivity(intent);
+            //Intent intent = new Intent(LoginActivity.this, SettingsActivity.class);
+            //startActivity(intent);
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.popBackStack();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            Fragment settingsFragment = new SettingsFragment();
+            fragmentTransaction.add(R.id.container, settingsFragment, "settings");
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+            findViewById(R.id.log_in_layout).setVisibility(View.INVISIBLE);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -107,5 +120,52 @@ public class LoginActivity extends AppCompatActivity {
             pb.setVisibility(View.INVISIBLE);
             layout.setVisibility(View.VISIBLE);
         }
+    }
+    @Override
+    public void onClick()
+    {
+        backToMain();
+    }
+
+    private void backToMain()
+    {
+        fragmentManager.popBackStack();
+        fragmentManager.beginTransaction()
+                .remove(fragmentManager.findFragmentByTag("settings"))
+                .addToBackStack(null)
+                .commit();
+        findViewById(R.id.log_in_layout).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (findViewById(R.id.log_in_layout).getVisibility() == View.INVISIBLE)
+            if (((SettingsFragment) fragmentManager.findFragmentByTag("settings")).isChanged())
+            {
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                builder.setTitle(R.string.alert)
+                        .setMessage(R.string.unsaved_settings)
+                        .setCancelable(false)
+                        .setNegativeButton(R.string.no,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                })
+                        .setPositiveButton(R.string.yes,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        backToMain();
+                                        dialog.cancel();
+                                    }
+                                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+            else
+                backToMain();
+        else
+            super.onBackPressed();
     }
 }
