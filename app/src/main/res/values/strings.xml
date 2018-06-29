@@ -117,4 +117,5 @@
     <string name="minus">-</string>
     <string name="end_wait_time">Время ожидания истекло</string>
     <string name="notifications">Уведомления</string>
+    <string name="app_name_v_0_1">Notificator v0.1</string>
 </resources>

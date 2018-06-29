@@ -29,7 +29,6 @@ public class UserDataStorage {
     private static final String MINUTE = "minute";
     private static final String SET_NOTIFICATION = "set_notifications";
     private static final String SET_ALARM = "set_alarm";
-    private static final String AUTH_DATA = "auth_data";
 
     public UserDataStorage(Context context) {
         Context appContext = context.getApplicationContext();
@@ -51,21 +50,22 @@ public class UserDataStorage {
 
     public void saveUserAuthData(UserCreditans creditans) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("login", creditans.getLogin());
-        editor.putString("password", creditans.getPassword());
+        editor.putString(LOGIN, creditans.getLogin());
+        editor.putString(PASSWORD, creditans.getPassword());
         editor.apply();
     }
 
     public UserCreditans getUserAuthData() {
-        String login = preferences.getString("login", "login");
-        String password = preferences.getString("password", "password");
+        String login = preferences.getString(LOGIN, "login");
+        String password = preferences.getString(PASSWORD, "password");
 
         return new UserCreditans(login, password);
     }
 
     public void cleanUserData() {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.remove(AUTH_DATA);
+        editor.remove(LOGIN);
+        editor.remove(PASSWORD);
         editor.remove(MESSAGE);
         editor.remove(TEMPLATE);
         editor.putString("Date", "");
