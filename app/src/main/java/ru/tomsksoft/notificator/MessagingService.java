@@ -7,6 +7,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -20,17 +22,7 @@ public class MessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // [START_EXCLUDE]
-        // There are two types of messages data messages and notification messages. Data messages are handled
-        // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
-        // traditionally used with GCM. Notification messages are only received here in onMessageReceived when the app
-        // is in the foreground. When the app is in the background an automatically generated notification is displayed.
-        // When the user taps on the notification they are returned to the app. Messages containing both notification
-        // and data payloads are treated as notification messages. The Firebase console always sends notification
-        // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
-        // [END_EXCLUDE]
 
-        // TODO: Somehow handle FCM messages.
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
         if (remoteMessage.getData().size() > 0) {
@@ -49,21 +41,20 @@ public class MessagingService extends FirebaseMessagingService {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
-        int priority;
-        SharedPreferences sharedPref = getSharedPreferences("app_settings", Context.MODE_PRIVATE);
-        if(sharedPref.getBoolean("set_Penetration", true))
-            priority = NotificationCompat.PRIORITY_MAX;
-        else
-            priority = NotificationCompat.PRIORITY_DEFAULT;
 
         String channelId = getString(R.string.default_notification_channel_id);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("FCM MessageSender")
+                        .setContentTitle("Notificator")
                         .setContentText(messageBody)
+                        .setTicker("Получено сообщение в Notificator")
+                        .setOngoing(true)
+                        .setVibrate(new long[]{1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000 })
+                        .setLights(5000,1000,1000)
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setAutoCancel(true)
-                        .setPriority(priority)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
                         .setDefaults(Notification.DEFAULT_ALL)
                         .setContentIntent(pendingIntent);
 

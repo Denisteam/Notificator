@@ -161,9 +161,6 @@ public class MainActivity extends AppCompatActivity {
     public void sendMessage() {
         final String msg = ((TextView) findViewById(R.id.messageField)).getText().toString();
 
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        int month = calendar.get(Calendar.MONTH);
-
         Message message = new Message(this, RPCMethod.NOTIFICATION);
         message.addParam("type", "1");
         message.addParam("message", msg);
@@ -182,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException | IncorrectDataException e) {
             e.printStackTrace();
         }
+
         addTemplate(((EditText)findViewById(R.id.messageField)).getText().toString());
         ((EditText)findViewById(R.id.messageField)).setText("");
     }

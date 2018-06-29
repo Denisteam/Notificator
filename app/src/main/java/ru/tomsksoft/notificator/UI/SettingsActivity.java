@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -62,7 +63,7 @@ public class SettingsActivity extends AppCompatActivity
         tp.setIs24HourView(true);
 //---------------------------------------------------------------------------------------------------
         final LinearLayout alarmSettingsLayout = findViewById(R.id.alarmSettingsLayout);
-        final LinearLayout addAlarmLayout = findViewById(R.id.addAlarmLayout);
+        final TextView acceptTextView = findViewById(R.id.textViewAccept);
 
         setAlarmTB = findViewById(R.id.toggleButtonSetAlarm);
         setNotifTB = findViewById(R.id.toggleButtonSetNotif);
@@ -82,11 +83,11 @@ public class SettingsActivity extends AppCompatActivity
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 saveAlarmParam();
+                acceptTextView.setVisibility(View.VISIBLE);
                 if (isChecked)
                 {
                     setAlarmTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
                     alarmSettingsLayout.setVisibility(View.VISIBLE);
-                    addAlarmLayout.setVisibility(View.VISIBLE);
                     loadAlarmParam();
                 }
                 else
@@ -94,7 +95,6 @@ public class SettingsActivity extends AppCompatActivity
 
                     setAlarmTB.setBackgroundColor(Color.RED);
                     alarmSettingsLayout.setVisibility(View.INVISIBLE);
-                    addAlarmLayout.setVisibility(View.INVISIBLE);
                     disableAlarm();
                 }
             }
@@ -102,9 +102,7 @@ public class SettingsActivity extends AppCompatActivity
 //---------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------
         if (setNotifTB.isChecked())
-        {
             setNotifTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
-        }
         else
             setNotifTB.setBackgroundColor(Color.RED);
 
@@ -112,9 +110,14 @@ public class SettingsActivity extends AppCompatActivity
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked)
+                {
                     setNotifTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
+                    acceptTextView.setVisibility(View.VISIBLE);
+                }
                 else
+                {
                     setNotifTB.setBackgroundColor(Color.RED);
+                }
                 new UserDataStorage(SettingsActivity.this).saveNotificationsCheck(isChecked);
             }
         });
@@ -122,7 +125,7 @@ public class SettingsActivity extends AppCompatActivity
         CompoundButton.OnCheckedChangeListener checkerListener = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    addAlarmLayout.setVisibility(View.VISIBLE);
+                    acceptTextView.setVisibility(View.VISIBLE);
             }
         };
         ((CheckBox)findViewById(R.id.checkBox1)).setOnCheckedChangeListener(checkerListener);
@@ -136,7 +139,7 @@ public class SettingsActivity extends AppCompatActivity
         tp.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                addAlarmLayout.setVisibility(View.VISIBLE);
+                acceptTextView.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -183,21 +186,11 @@ public class SettingsActivity extends AppCompatActivity
 
     public void onClickSetAlarm(View view)
     {
-        boolean[] chek = new boolean[7];
-        chek[0] = ((CheckBox)findViewById(R.id.checkBox1)).isChecked();
-        chek[1] = ((CheckBox)findViewById(R.id.checkBox2)).isChecked();
-        chek[2] = ((CheckBox)findViewById(R.id.checkBox3)).isChecked();
-        chek[3] = ((CheckBox)findViewById(R.id.checkBox4)).isChecked();
-        chek[4] = ((CheckBox)findViewById(R.id.checkBox5)).isChecked();
-        chek[5] = ((CheckBox)findViewById(R.id.checkBox6)).isChecked();
-        chek[6] = ((CheckBox)findViewById(R.id.checkBox7)).isChecked();
-        System.out.println(chek[0] + " " + chek[1] + " " + chek[2] + " " + chek[3] + " " + chek[4] + " " + chek[5] + " " + chek[6]);
-        enableAlarm(tp.getCurrentHour(), tp.getCurrentMinute(), chek);
-        (findViewById(R.id.addAlarmLayout)).setVisibility(View.INVISIBLE);
-        Toast.makeText(SettingsActivity.this, "Напоминание установлено", Toast.LENGTH_SHORT).show();
+        enableAlarm(tp.getCurrentHour(), tp.getCurrentMinute());
+        Toast.makeText(SettingsActivity.this, R.string.saved_settings, Toast.LENGTH_SHORT).show();
     }
 
-    public void enableAlarm(int hourOfDay, int minute, boolean[] chek)
+    public void enableAlarm(int hourOfDay, int minute)
     {
         saveAlarmParam();
 
@@ -217,6 +210,21 @@ public class SettingsActivity extends AppCompatActivity
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
+
+        saveAlarmParam();
+
+        Intent intent;
+
+        if (new UserDataStorage(this).getUserAuthData().getLogin().equals("login"))
+        {
+            intent = new Intent(SettingsActivity.this, LoginActivity.class);
+        }
+        else
+        {
+            intent = new Intent(SettingsActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
+        startActivity(intent);
     }
 
     private void disableAlarm()
@@ -290,25 +298,32 @@ public class SettingsActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        if ((findViewById(R.id.addAlarmLayout)).getVisibility() == View.VISIBLE)
-            Toast.makeText(SettingsActivity.this, "отменено", Toast.LENGTH_SHORT).show();
-
-        saveAlarmParam();
-
-        Intent intent;
-
-        if (new UserDataStorage(this).getUserAuthData().getLogin().equals("login"))
+        if (findViewById(R.id.textViewAccept).getVisibility() == View.VISIBLE)
         {
-            intent = new Intent(SettingsActivity.this, LoginActivity.class);
+            AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+            builder.setTitle(R.string.alert)
+                    .setMessage(R.string.unsaved_settings)
+                    .setCancelable(false)
+                    .setNegativeButton(R.string.no,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            })
+                    .setPositiveButton(R.string.yes,
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);                                    startActivity(intent);
+                                    dialog.cancel();
+                                }
+                            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
         else
-        {
-            intent = new Intent(SettingsActivity.this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        }
-        startActivity(intent);
-
-        //super.onBackPressed();
+            super.onBackPressed();
     }
 
     @Override

@@ -6,79 +6,38 @@
         InstanceID token to logcat.</string>
     <string name="subscribe_to_news">Subscribe To News</string>
     <string name="log_token">Log Token</string>
-
     <string name="msg_subscribed">Subscribed to news topic</string>
     <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
-
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
-    <!--
-        This is the name that users will see when interacting with this channel.
-        It should describe the category of notifications that will be sent through this channel
-     -->
     <string name="default_notification_channel_name" translatable="true">News</string>
 
     <string name="preference_file_key">notificator_storage</string>
-
-    <string name="phone_number">Номер телефона</string>
     <string name="settings_storage" translatable="false">settings</string>
     <string name="log_in">Войти</string>
     <string name="log_out">Выйти</string>
     <string name="new_message">Новое сообщение</string>
     <string name="send_message">Отправить сообщение</string>
-    <string name="time_of_arrival">Опаздаю на</string>
     <string name="send_message_button">Отправить</string>
-    <string name="message_type">Тип сообщения</string>
-    <string name="message_template">Шаблоны</string>
-    <string name="set_timer_settings">Установить таймер</string>
-    <string name="notify_settings">Настройки оповещений</string>
     <string name="password">Пароль</string>
-    <string name="set_penetration_signal">Звуковой сигнал через беззвучный режим</string>
     <string name="message">Сообщение</string>
     <string name="settings">Настройки</string>
     <string name="sending">Отправлено</string>
     <string name="set_notify_timer">Установка времени срабатывания предупреждения</string>
     <string name="set_alarm">Включить напоминание по времени</string>
-    <string name="i_am_here">Я на месте</string>
     <string name="monday">ПН</string>
     <string name="tuesday">ВТ</string>
     <string name="wednesday">СР</string>
     <string name="thursday">ЧТ</string>
-    <string name="saturday" >СБ</string>
+    <string name="saturday">СБ</string>
     <string name="sunday">ВС</string>
     <string name="friday">ПТ</string>
     <string name="ok">Ок</string>
     <string name="no">Нет</string>
     <string name="yes">Да</string>
-    <string-array name="templates">
-        <item>Я на месте</item>
-        <item>Я опаздываю</item>
-        <item>Я не приду</item>
-    </string-array><string-array name="causes">
-        <item>По личной причине</item>
-        <item>В пробке</item>
-        <item>Проспал</item>
-    </string-array>
-    <string-array name="time">
-        <item>5 минут</item>
-        <item>10 минут</item>
-        <item>15 минут</item>
-        <item>30 минут</item>
-        <item>45 минут</item>
-        <item>1 час</item>
-        <item>2 часа</item>
-        <item>3 часа</item>
-        <item>5 часов</item>
-        <item>более чем 5 часов</item>
-    </string-array>
     <string name="days_of_the_week">Дни срабатывания предупреждения</string>
-    <string name="todo">TODO</string>
-    <string name="cause">Причина</string>
-    <string name="explanation">Пояснение</string>
-    <string name="additionally">Дополнительно</string>
     <string name="back">Назад</string>
     <string name="on">Вкл</string>
     <string name="off">Выкл</string>
-    <string name="set_notification">Поставить напоминание</string>
     <string name="accept_changes">Подтвердить изменения</string>
     <string name="alert">Внимание!</string>
     <string name="connection_error">Ошибка соединения</string>
@@ -86,36 +45,14 @@
     <string name="login">Логин</string>
     <string name="incorrect_data">Введены некорректные данные</string>
     <string name="are_you_sure_to_exit">Вы действительно хотите выйти из учётной записи?</string>
-    <string name="date">Дата</string>
-    <string name="january">января</string>
-    <string name="february">февраля</string>
-    <string name="march">марта</string>
-    <string name="april">апреля</string>
-    <string name="may">мая</string>
-    <string name="june">июня</string>
-    <string name="july">июля</string>
-    <string name="august">августа</string>
-    <string name="september">сентября</string>
-    <string name="october">октября</string>
-    <string name="november">ноября</string>
-    <string name="december">декабря</string>
+    <string name="unsaved_settings">Настройки на сохранены, вы действительно хотите выйти?</string>
     <string name="plus">+</string>
-    <string name="add_cause">Добавить новый шаблон</string>
-    <string name="cause_name">Название шаблона</string>
-    <string name="cause_text">Текст шаблона</string>
     <string name="cancel">Отмена</string>
-    <string name="add">Добавить</string>
-    <string name="added">Добавлено</string>
     <string name="null_text">Отсутствует текст</string>
-    <string name="null_cause_name">Отсутствует имя шаблона</string>
-    <string name="edit_causes">Редактировать шаблоны</string>
-    <string name="edit_cause">Изменить шаблон</string>
-    <string name="edit">Изменить</string>
-    <string name="edited">Изменено</string>
-    <string name="delete">Удалить</string>
-    <string name="delited">Удалено</string>
     <string name="minus">-</string>
     <string name="end_wait_time">Время ожидания истекло</string>
     <string name="notifications">Уведомления</string>
     <string name="app_name_v_0_1">Notificator v0.1</string>
+    <string name="last_sended_messages">Последние отправленные сообщения</string>
+    <string name="saved_settings">Настройки сохранены</string>
 </resources>

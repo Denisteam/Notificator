@@ -14,13 +14,6 @@ import ru.tomsksoft.notificator.message.RPCMethod;
 public class InstanceIDService extends FirebaseInstanceIdService {
     private static final String TAG = "MyFirebaseIIDService";
 
-    /**
-     * Called if InstanceID token is updated. This may occur if the security of
-     * the previous token had been compromised. Note that this is called when the InstanceID token
-     * is initially generated.
-     */
-
-
     @Override
     public void onTokenRefresh() {
 
@@ -35,9 +28,7 @@ public class InstanceIDService extends FirebaseInstanceIdService {
         message.addParam("os", Build.VERSION.RELEASE);
         try {
             MessageSender.send(this, message);
-        } catch (IncorrectDataException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IncorrectDataException | InterruptedException e) {
             e.printStackTrace();
         }
     }
