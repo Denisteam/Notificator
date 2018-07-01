@@ -18,7 +18,6 @@ import ru.tomsksoft.notificator.UserDataStorage;
 public class AlarmBootReceiver extends BroadcastReceiver {
     private static final String TAG = "ALARM_BOOT_RECEIVER";
 
-    AlarmManager am;
     PendingIntent alarmIntent;
 
     @Override
@@ -33,6 +32,6 @@ public class AlarmBootReceiver extends BroadcastReceiver {
         int minute = tmp[1];
 
         Set<DayOfWeek> dayOfWeekSet = dataStorage.loadDaysOfWeekSet();
-
+        AlarmTuner.setAlarm(appContext, hourOfDay, minute, alarmIntent, dayOfWeekSet);
     }
 }

@@ -35,6 +35,8 @@ public class AlarmTuner {
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
         calendar.add(Calendar.DATE, min);
+        SimpleDateFormat logDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Log.d(TAG, logDate.format(calendar.getTime()));
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 1000 * 60 * 60 * 24, alarmIntent);

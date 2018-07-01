@@ -13,6 +13,7 @@ import android.support.v4.app.NotificationCompat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 
 import ru.tomsksoft.notificator.UI.LoginActivity;
 import ru.tomsksoft.notificator.R;
@@ -20,21 +21,23 @@ import ru.tomsksoft.notificator.UserDataStorage;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String TAG = "ALARM";
-
     Context appContext;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         appContext = context.getApplicationContext();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE", Locale.ENGLISH);
-        Date date = new Date();
-        String dayOfWeek = dateFormat.format(date).toUpperCase();
-        UserDataStorage dataStorage = new UserDataStorage(context);
-        boolean rightDay = dataStorage.isDayOfWeekSet(DayOfWeek.valueOf(dayOfWeek));
+        Intent target = new Intent(appContext, AlarmReceiver.class);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, target, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        if (rightDay) {
-            sendNotification("Если вы опаздываете - оповеcтите об этом");
-        }
+        UserDataStorage dataStorage = new UserDataStorage(context);
+        int[] tmp = dataStorage.getTime();
+        int hourOfDay = tmp[0];
+        int minute = tmp[1];
+
+        Set<DayOfWeek> dayOfWeekSet = dataStorage.loadDaysOfWeekSet();
+        AlarmTuner.setAlarm(appContext, hourOfDay, minute, alarmIntent, dayOfWeekSet);
+
+        sendNotification("Если вы опаздываете - оповеcтите об этом");
     }
 
     private void sendNotification(String messageBody) {
