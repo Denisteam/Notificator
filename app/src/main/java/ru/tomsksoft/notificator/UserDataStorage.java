@@ -109,14 +109,23 @@ public class UserDataStorage {
         return data;
     }
 
-    public void saveAlarmParam(boolean setAlarm, Set<DayOfWeek> dayOfWeeks, int hour, int minute) {
+    public void saveAlarmParam(Set<DayOfWeek> dayOfWeeks, int hour, int minute) {
         SharedPreferences.Editor editor = preferences.edit();
         Log.d(TAG, Integer.toString(DayOfWeek.getMaskByDayOfWeekList(dayOfWeeks)));
-        editor.putBoolean(SET_ALARM, setAlarm);
         editor.putInt(DAYS_OF_WEEK, DayOfWeek.getMaskByDayOfWeekList(dayOfWeeks));
         editor.putInt(HOUR, hour);
         editor.putInt(MINUTE, minute);
         editor.apply();
+    }
+
+    public void setAlarmEnable(boolean enable) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(SET_ALARM, enable);
+        editor.apply();
+    }
+
+    public boolean isAlarmEnable() {
+        return preferences.getBoolean(SET_ALARM, false);
     }
 
     public boolean isDayOfWeekSet(DayOfWeek dayOfWeek) {
@@ -126,18 +135,13 @@ public class UserDataStorage {
     public Set<DayOfWeek> loadDaysOfWeekSet() {
         return DayOfWeek.getListOfDayOfWeekByMask(preferences.getInt(DAYS_OF_WEEK, 0));
     }
-
-    public boolean getAlarmCheck() {
-        boolean data = preferences.getBoolean(SET_ALARM, false);
-        Log.d(TAG, "set_Alarm: " + data);
-        return data;
-    }
     
-    public Calendar getTime() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR, preferences.getInt(HOUR, 0));
-        calendar.set(Calendar.MINUTE, preferences.getInt(MINUTE, 0));
-        return calendar;
+    public int[] getTime() {
+        int[] time = new int[2];
+        time[0] = preferences.getInt(HOUR, -1);
+        time[1] = preferences.getInt(MINUTE, -1);
+
+        return time;
     }
 
     public void refreshToken(String token) {

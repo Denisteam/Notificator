@@ -29,12 +29,12 @@ import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.alarm.AlarmBootReceiver;
 import ru.tomsksoft.notificator.alarm.AlarmReceiver;
+import ru.tomsksoft.notificator.alarm.AlarmTuner;
 import ru.tomsksoft.notificator.alarm.DayOfWeek;
 
 
 public class SettingsActivity extends AppCompatActivity
 {
-    private AlarmManager am;
     private PendingIntent alarmIntent;
     private TimePicker tp;
     private ToggleButton setAlarmTB;
@@ -55,7 +55,6 @@ public class SettingsActivity extends AppCompatActivity
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         boolean changed = false;
-        am = (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
@@ -184,26 +183,13 @@ public class SettingsActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void onClickSetAlarm(View view)
-    {
-        enableAlarm(tp.getCurrentHour(), tp.getCurrentMinute());
+    public void onClickSetAlarm(View view) {
         Toast.makeText(SettingsActivity.this, R.string.saved_settings, Toast.LENGTH_SHORT).show();
     }
 
     public void enableAlarm(int hourOfDay, int minute)
     {
         saveAlarmParam();
-
-        Calendar calendar = Calendar.getInstance();
-        System.out.println(calendar.getTimeInMillis() + "  " + hourOfDay + "  " + minute);
-        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.MILLISECOND, 0);
-        System.out.println(calendar.getTimeInMillis());
-
-        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000 * 60 * 60 * 24, alarmIntent);
-
         ComponentName receiver = new ComponentName(this, AlarmBootReceiver.class);
         PackageManager pm = getPackageManager();
 
@@ -211,16 +197,13 @@ public class SettingsActivity extends AppCompatActivity
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
 
-        saveAlarmParam();
-
         Intent intent;
 
-        if (new UserDataStorage(this).getUserAuthData().getLogin().equals("login"))
-        {
+        if (new UserDataStorage(this).getUserAuthData().getLogin().equals("login")) {
             intent = new Intent(SettingsActivity.this, LoginActivity.class);
         }
-        else
-        {
+
+        else {
             intent = new Intent(SettingsActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
@@ -229,9 +212,9 @@ public class SettingsActivity extends AppCompatActivity
 
     private void disableAlarm()
     {
-        saveAlarmParam();
+        new UserDataStorage(this).setAlarmEnable(false);
 
-        am.cancel(alarmIntent);
+        AlarmTuner.disableAlarm(this, alarmIntent);
 
         ComponentName receiver = new ComponentName(this, AlarmBootReceiver.class);
         PackageManager pm = getPackageManager();
@@ -272,8 +255,11 @@ public class SettingsActivity extends AppCompatActivity
             dayOfWeeks.add(DayOfWeek.SUNDAY);
         }
 
+        int hourOfDay = tp.getCurrentHour();
+        int minute = tp.getCurrentMinute();
+        AlarmTuner.setAlarm(this, hourOfDay, minute, alarmIntent, dayOfWeeks);
         UserDataStorage dataStorage = new UserDataStorage(this);
-        dataStorage.saveAlarmParam(setAlarmTB.isChecked(), dayOfWeeks, tp.getCurrentHour(), tp.getCurrentMinute());
+        dataStorage.saveAlarmParam(dayOfWeeks, tp.getCurrentHour(), tp.getCurrentMinute());
     }
 
     private void loadAlarmParam()
@@ -281,7 +267,7 @@ public class SettingsActivity extends AppCompatActivity
         UserDataStorage dataStorage = new UserDataStorage(this);
         int mask = DayOfWeek.getMaskByDayOfWeekList(dataStorage.loadDaysOfWeekSet());
 
-        setAlarmTB.setChecked(dataStorage.getAlarmCheck());
+        setAlarmTB.setChecked(dataStorage.isAlarmEnable());
         ((CheckBox)findViewById(R.id.checkBox1)).setChecked(DayOfWeek.MONDAY.isDayOfWeekSet(mask));
         ((CheckBox)findViewById(R.id.checkBox2)).setChecked(DayOfWeek.TUESDAY.isDayOfWeekSet(mask));
         ((CheckBox)findViewById(R.id.checkBox3)).setChecked(DayOfWeek.WEDNESDAY.isDayOfWeekSet(mask));
@@ -290,9 +276,9 @@ public class SettingsActivity extends AppCompatActivity
         ((CheckBox)findViewById(R.id.checkBox6)).setChecked(DayOfWeek.SATURDAY.isDayOfWeekSet(mask));
         ((CheckBox)findViewById(R.id.checkBox7)).setChecked(DayOfWeek.SUNDAY.isDayOfWeekSet(mask));
 
-        Calendar calendar = dataStorage.getTime();
-        tp.setCurrentHour(calendar.get(Calendar.HOUR));
-        tp.setCurrentMinute(calendar.get(Calendar.MINUTE));
+        int[] tmp = dataStorage.getTime();
+        tp.setCurrentHour(tmp[0]);
+        tp.setCurrentMinute(tmp[1]);
     }
 
     @Override

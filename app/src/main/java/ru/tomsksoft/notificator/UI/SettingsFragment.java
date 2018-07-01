@@ -32,6 +32,7 @@ import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.alarm.AlarmBootReceiver;
 import ru.tomsksoft.notificator.alarm.AlarmReceiver;
+import ru.tomsksoft.notificator.alarm.AlarmTuner;
 import ru.tomsksoft.notificator.alarm.DayOfWeek;
 
 import static android.content.Context.ALARM_SERVICE;
@@ -99,8 +100,7 @@ public class SettingsFragment extends Fragment
 
         loadAlarmParam();
 //---------------------------------------------------------------------------------------------------
-        if (setAlarmTB.isChecked())
-        {
+        if (setAlarmTB.isChecked()) {
             setAlarmTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
             alarmSettingsLayout.setVisibility(View.VISIBLE);
         }
@@ -184,7 +184,7 @@ public class SettingsFragment extends Fragment
     {
         @Override
         public void onClick(View v) {
-            enableAlarm(tp.getCurrentHour(), tp.getCurrentMinute());
+            enableAlarm();
             Toast.makeText(getActivity(), R.string.saved_settings, Toast.LENGTH_SHORT).show();
             onSomeClick(v);
         }
@@ -199,17 +199,9 @@ public class SettingsFragment extends Fragment
         return isChanged;
     }
 
-    public void enableAlarm(int hourOfDay, int minute)
+    public void enableAlarm()
     {
         saveAlarmParam();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000 * 60 * 60 * 24, alarmIntent);
 
         ComponentName receiver = new ComponentName(getActivity(), AlarmBootReceiver.class);
         PackageManager pm = getActivity().getPackageManager();
@@ -217,13 +209,11 @@ public class SettingsFragment extends Fragment
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP);
-
-        saveAlarmParam();
     }
 
     private void disableAlarm()
     {
-        saveAlarmParam();
+        new UserDataStorage(getActivity()).setAlarmEnable(false);
 
         am.cancel(alarmIntent);
 
@@ -266,8 +256,11 @@ public class SettingsFragment extends Fragment
             dayOfWeeks.add(DayOfWeek.SUNDAY);
         }
 
+        int hourOfDay = tp.getCurrentHour();
+        int minute = tp.getCurrentMinute();
+        AlarmTuner.setAlarm(getActivity(), hourOfDay, minute, alarmIntent, dayOfWeeks);
         UserDataStorage dataStorage = new UserDataStorage(getActivity());
-        dataStorage.saveAlarmParam(setAlarmTB.isChecked(), dayOfWeeks, tp.getCurrentHour(), tp.getCurrentMinute());
+        dataStorage.saveAlarmParam(dayOfWeeks, hourOfDay, minute);
     }
 
     private void loadAlarmParam()
@@ -275,7 +268,7 @@ public class SettingsFragment extends Fragment
         UserDataStorage dataStorage = new UserDataStorage(getActivity());
         int mask = DayOfWeek.getMaskByDayOfWeekList(dataStorage.loadDaysOfWeekSet());
 
-        setAlarmTB.setChecked(dataStorage.getAlarmCheck());
+        setAlarmTB.setChecked(dataStorage.isAlarmEnable());
         ((CheckBox)view.findViewById(R.id.checkBox1)).setChecked(DayOfWeek.MONDAY.isDayOfWeekSet(mask));
         ((CheckBox)view.findViewById(R.id.checkBox2)).setChecked(DayOfWeek.TUESDAY.isDayOfWeekSet(mask));
         ((CheckBox)view.findViewById(R.id.checkBox3)).setChecked(DayOfWeek.WEDNESDAY.isDayOfWeekSet(mask));
@@ -284,9 +277,9 @@ public class SettingsFragment extends Fragment
         ((CheckBox)view.findViewById(R.id.checkBox6)).setChecked(DayOfWeek.SATURDAY.isDayOfWeekSet(mask));
         ((CheckBox)view.findViewById(R.id.checkBox7)).setChecked(DayOfWeek.SUNDAY.isDayOfWeekSet(mask));
 
-        Calendar calendar = dataStorage.getTime();
-        tp.setCurrentHour(calendar.get(Calendar.HOUR));
-        tp.setCurrentMinute(calendar.get(Calendar.MINUTE));
+        int[] tmp = dataStorage.getTime();
+        tp.setCurrentHour(tmp[0]);
+        tp.setCurrentMinute(tmp[1]);
     }
 
     @Override

@@ -37,13 +37,92 @@ public class MessageSender {
         final String password = authData.getPassword();
         alreadyTriedAuthenticating = false;
 
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<Boolean> result = executor.submit(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                URL url;
+                try {
+                    url = new URL("https://extern.tomsksoft.com/user/note/set/");
+
+                    Log.d(TAG, userName);
+                    Log.d(TAG, password);
+                    Authenticator.setDefault(new Authenticator() {
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            if (!alreadyTriedAuthenticating) {
+                                alreadyTriedAuthenticating = true;
+                                return new PasswordAuthentication(userName, password.toCharArray());
+                            } else {
+                                return null;
+                            }
+                        }
+                    });
+                    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+                    connection.setConnectTimeout(TIMEOUT_VALUE);
+                    connection.setReadTimeout(TIMEOUT_VALUE);
+                    connection.setDoOutput(true);
+                    connection.setDoInput(true);
+                    connection.setRequestMethod("POST");
+
+                    Gson gson = new Gson();
+                    Log.d(TAG, gson.toJson(message));
+                    connection.getOutputStream().write(gson.toJson(message).getBytes());
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    connection.connect();
+
+                    String content;
+                    while ((content = reader.readLine()) != null) {
+                        Log.d(TAG, content);
+                    }
+
+                    int rc = connection.getResponseCode();
+                    Log.d(TAG, String.valueOf(rc));
+                    connection.disconnect();
+
+                    if (rc == 200) {
+                        if ("token_add".equals(message.getMethod())) {
+                            UserDataStorage dataStorage = new UserDataStorage(context);
+                            dataStorage.setTokenRefreshed(false);
+                            Log.d(TAG, "Token successfully refreshed!");
+                        }
+                        return true;
+                    } else if (rc == 401) {
+                        new UserDataStorage(context).cleanUserData();
+                        throw new IncorrectDataException(userName + ":" + password);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+        });
+        executor.shutdown();
+
+        executor.awaitTermination(5, TimeUnit.SECONDS);
+
+        if (result.isDone()) {
+            boolean res;
+            try {
+                res = result.get();
+            } catch (ExecutionException e) {
+                throw new IncorrectDataException(userName + ":" + password);
+            }
+            Log.d(TAG, "connecting result: " + String.valueOf(res));
+            return res;
+        }
+
+        return false;
+    }
+
+    public static boolean checkLogIn(Context context, final String userName, final String password) throws IncorrectDataException, InterruptedException {
+        alreadyTriedAuthenticating = false;
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
         Future<Boolean> result = executor.submit(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-
                 URL url;
                 try {
                     url = new URL("https://extern.tomsksoft.com/user/note/set/");
@@ -64,51 +143,19 @@ public class MessageSender {
                     HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
                     connection.setConnectTimeout(TIMEOUT_VALUE);
                     connection.setReadTimeout(TIMEOUT_VALUE);
-                    connection.setDoOutput(true);
-                    connection.setDoInput(true);
-                    connection.setRequestMethod("POST");
-                    if (message != null) {
-                        Gson gson = new Gson();
-                        Log.d(TAG, gson.toJson(message));
-                        connection.getOutputStream().write(gson.toJson(message).getBytes());
-                    }
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     connection.connect();
 
-                    String content;
-                    while ((content = reader.readLine()) != null) {
-                        Log.d(TAG, content);
-                    }
-
                     int rc = connection.getResponseCode();
+                    connection.disconnect();
                     Log.d(TAG, String.valueOf(rc));
                     if (rc == 200) {
-                        connection.disconnect();
-                        //если отправка токена на сервер прошла удачно, то запоминаем, что токен отправлен
-                        if (message != null && "token_add".equals(message.getMethod())) {
-                            UserDataStorage dataStorage = new UserDataStorage(context);
-                            dataStorage.setTokenRefreshed(false);
-                            Log.d(TAG, "Token successfully refreshed!");
-                        } else if (message == null) {
-                            UserDataStorage dataStorage = new UserDataStorage(context);
-                            dataStorage.saveUserAuthData(new UserCreditans(userName, password));
-                            if (dataStorage.isTokenRefreshed()) {
-                                Message msg = new Message(context, RPCMethod.TOKEN_ADD);
-                                msg.addParam("token", dataStorage.getToken());
-                                msg.addParam("model", Build.MANUFACTURER + " " + Build.MODEL);
-                                msg.addParam("os", Build.VERSION.RELEASE);
-                                send(context, msg);
-                            }
-                            return true;
-                        }
+                        UserDataStorage dataStorage = new UserDataStorage(context);
+                        dataStorage.saveUserAuthData(new UserCreditans(userName, password));
+
                         return true;
                     } else if (rc == 401) {
-                        connection.disconnect();
-                        new UserDataStorage(context).cleanUserData();
                         throw new IncorrectDataException(userName + ":" + password);
                     }
-
-                    connection.disconnect();
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -133,57 +180,5 @@ public class MessageSender {
         }
 
         return false;
-    }
-
-    public static boolean checkLogIn(Context context, final String userName, final String password) throws IncorrectDataException, InterruptedException {
-        UserDataStorage dataStorage = new UserDataStorage(context);
-        dataStorage.saveUserAuthData(new UserCreditans(userName, password));
-
-        return send(context, null);
-
-        /*
-        try {
-            URL url = new URL("https://extern.tomsksoft.com/user/note/set/");
-
-            Authenticator.setDefault(new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-
-                    if (!alreadyTriedAuthenticating) {
-                        alreadyTriedAuthenticating = true;
-                        return new PasswordAuthentication(userName, password.toCharArray());
-                    } else {
-                        return null;
-                    }
-                }
-            });
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setConnectTimeout(TIMEOUT_VALUE);
-            connection.setReadTimeout(TIMEOUT_VALUE);
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setRequestMethod("POST");
-            connection.connect();
-            int rc = connection.getResponseCode();
-            if (rc == 200) {
-                UserDataStorage dataStorage = new UserDataStorage(context);
-                dataStorage.saveUserAuthData(userName, password);
-                if (dataStorage.isTokenRefreshed()) {
-                    Message message = new Message(context, RPCMethod.TOKEN_ADD);
-                    message.addParam("token", dataStorage.getToken());
-                    message.addParam("model", Build.MANUFACTURER + " " + Build.MODEL);
-                    message.addParam("os", Build.VERSION.RELEASE);
-                    send(context, message);
-                }
-                return true;
-            } else if (rc == 401) {
-                throw new IncorrectDataException(userName + ":" + password);
-            }
-            connection.disconnect();
-        } catch (SocketTimeoutException e) {
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;*/
     }
 }

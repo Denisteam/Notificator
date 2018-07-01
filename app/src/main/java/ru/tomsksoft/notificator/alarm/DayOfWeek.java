@@ -1,6 +1,8 @@
 package ru.tomsksoft.notificator.alarm;
 
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +19,7 @@ public enum DayOfWeek {
 
     private int value;
     public static final int WEEK = 127;
+    private static final String TAG = "DAY_OF_WEEK";
 
     DayOfWeek(int value) {
         this.value = value;
@@ -33,6 +36,16 @@ public enum DayOfWeek {
         }
 
         return tmp;
+    }
+
+    public static int countOfDaysBetween(DayOfWeek first, DayOfWeek second) {
+        int difference = second.ordinal() - first.ordinal();
+
+        if (difference < 0) {
+            return (7 + difference);
+        }
+
+        return difference;
     }
 
     public boolean isDayOfWeekSet(int mask) {

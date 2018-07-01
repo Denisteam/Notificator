@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,7 +22,9 @@ import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserCreditans;
 import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
+import ru.tomsksoft.notificator.message.Message;
 import ru.tomsksoft.notificator.message.MessageSender;
+import ru.tomsksoft.notificator.message.RPCMethod;
 
 
 public class LoginActivity extends AppCompatActivity implements SettingsFragment.OnClickSettingsListener{
@@ -77,6 +80,7 @@ public class LoginActivity extends AppCompatActivity implements SettingsFragment
     {
         login();
     }
+
     private void login()
     {
         final String login = ((EditText) findViewById(R.id.login)).getText().toString();
@@ -90,6 +94,15 @@ public class LoginActivity extends AppCompatActivity implements SettingsFragment
         try {
             boolean res = MessageSender.checkLogIn(LoginActivity.this, login, password);
                 if (res) {
+                    UserDataStorage dataStorage = new UserDataStorage(this);
+                    if (dataStorage.isTokenRefreshed()) {
+                        Message msg = new Message(this, RPCMethod.TOKEN_ADD);
+                        msg.addParam("token", dataStorage.getToken());
+                        msg.addParam("model", Build.MANUFACTURER + " " + Build.MODEL);
+                        msg.addParam("os", Build.VERSION.RELEASE);
+                        MessageSender.send(this, msg);
+                    }
+
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
