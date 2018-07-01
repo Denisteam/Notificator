@@ -1,6 +1,5 @@
 package ru.tomsksoft.notificator.UI;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -21,7 +20,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import java.util.Calendar;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -66,7 +65,7 @@ public class SettingsActivity extends AppCompatActivity
 
         setAlarmTB = findViewById(R.id.toggleButtonSetAlarm);
         setNotifTB = findViewById(R.id.toggleButtonSetNotif);
-        setNotifTB.setChecked(new UserDataStorage(this).getNotificationsCheck());
+        setNotifTB.setChecked(new UserDataStorage(this).isNotificationsEnabled());
 
         loadAlarmParam();
 //---------------------------------------------------------------------------------------------------

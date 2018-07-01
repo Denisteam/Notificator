@@ -22,14 +22,18 @@ public class InstanceIDService extends FirebaseInstanceIdService {
 
         UserDataStorage dataStorage = new UserDataStorage(this);
         dataStorage.refreshToken(refreshedToken);
+        boolean enable = dataStorage.isNotificationsEnabled();
         Message message = new Message(this, RPCMethod.TOKEN_ADD);
         message.addParam("token", dataStorage.getToken());
         message.addParam("model", Build.MANUFACTURER + " " + Build.MODEL);
         message.addParam("os", Build.VERSION.RELEASE);
-        try {
-            MessageSender.send(this, message);
-        } catch (IncorrectDataException | InterruptedException e) {
-            e.printStackTrace();
+
+        if (enable) {
+            try {
+                MessageSender.send(this, message);
+            } catch (IncorrectDataException | InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

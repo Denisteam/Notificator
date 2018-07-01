@@ -58,7 +58,7 @@
             android:enabled="false">
 
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
 
         </receiver>
@@ -66,7 +66,8 @@
         <receiver android:name=".alarm.AlarmReceiver"/>
 
         <service
-            android:name=".MessagingService">
+            android:name=".MessagingService"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

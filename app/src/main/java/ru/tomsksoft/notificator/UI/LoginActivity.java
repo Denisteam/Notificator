@@ -95,7 +95,7 @@ public class LoginActivity extends AppCompatActivity implements SettingsFragment
             boolean res = MessageSender.checkLogIn(LoginActivity.this, login, password);
                 if (res) {
                     UserDataStorage dataStorage = new UserDataStorage(this);
-                    if (dataStorage.isTokenRefreshed()) {
+                    if (dataStorage.isNotificationsEnabled() && dataStorage.isTokenRefreshed()) {
                         Message msg = new Message(this, RPCMethod.TOKEN_ADD);
                         msg.addParam("token", dataStorage.getToken());
                         msg.addParam("model", Build.MANUFACTURER + " " + Build.MODEL);

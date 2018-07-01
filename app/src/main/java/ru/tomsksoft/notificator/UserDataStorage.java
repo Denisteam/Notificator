@@ -103,7 +103,7 @@ public class UserDataStorage {
         editor.apply();
     }
 
-    public boolean getNotificationsCheck() {
+    public boolean isNotificationsEnabled() {
         boolean data = preferences.getBoolean(SET_NOTIFICATION, true);
         Log.d(TAG, "setNotifications: " + data);
         return data;

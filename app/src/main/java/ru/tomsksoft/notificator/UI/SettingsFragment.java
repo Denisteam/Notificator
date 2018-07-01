@@ -7,15 +7,14 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.app.Fragment;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -24,16 +23,23 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import java.util.Calendar;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import java.util.HashSet;
 import java.util.Set;
 
+import ru.tomsksoft.notificator.MessagingService;
 import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.alarm.AlarmBootReceiver;
 import ru.tomsksoft.notificator.alarm.AlarmReceiver;
 import ru.tomsksoft.notificator.alarm.AlarmTuner;
 import ru.tomsksoft.notificator.alarm.DayOfWeek;
+import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
+import ru.tomsksoft.notificator.message.Message;
+import ru.tomsksoft.notificator.message.MessageSender;
+import ru.tomsksoft.notificator.message.RPCMethod;
 
 import static android.content.Context.ALARM_SERVICE;
 
@@ -96,7 +102,7 @@ public class SettingsFragment extends Fragment
 
         setAlarmTB = view.findViewById(R.id.toggleButtonSetAlarm);
         setNotifTB = view.findViewById(R.id.toggleButtonSetNotif);
-        setNotifTB.setChecked(new UserDataStorage(getActivity()).getNotificationsCheck());
+        setNotifTB.setChecked(new UserDataStorage(getActivity()).isNotificationsEnabled());
 
         loadAlarmParam();
 //---------------------------------------------------------------------------------------------------
@@ -197,6 +203,48 @@ public class SettingsFragment extends Fragment
     public boolean isChanged()
     {
         return isChanged;
+    }
+
+    private void enableNotifications() {
+        new UserDataStorage(getActivity()).saveNotificationsCheck(true);
+        ComponentName service = new ComponentName(getActivity(), MessagingService.class);
+        PackageManager pm = getActivity().getPackageManager();
+
+        pm.setComponentEnabledSetting(service,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+
+        Message message = new Message(getActivity(), RPCMethod.TOKEN_ADD);
+        message.addParam("token", FirebaseInstanceId.getInstance().getToken());
+        message.addParam("model", Build.MANUFACTURER + " " + Build.MODEL);
+        message.addParam("os", Build.VERSION.RELEASE);
+        try {
+            MessageSender.send(getActivity(), message);
+        } catch (IncorrectDataException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void disableNotifications() {
+        new UserDataStorage(getActivity()).saveNotificationsCheck(false);
+        ComponentName service = new ComponentName(getActivity(), MessagingService.class);
+        PackageManager pm = getActivity().getPackageManager();
+
+        pm.setComponentEnabledSetting(service,
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+
+        Message message = new Message(getActivity(), RPCMethod.TOKEN_ADD);
+        message.addParam("token", FirebaseInstanceId.getInstance().getToken());
+        try {
+            MessageSender.send(getActivity(), message);
+        } catch (IncorrectDataException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void enableAlarm()
