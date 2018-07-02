@@ -54,6 +54,7 @@ public class SettingsFragment extends Fragment
     private View view;
     private OnClickSettingsListener listener;
     private boolean isChanged;
+    private boolean isNotifChnged;
 
     public interface OnClickSettingsListener {
         public void onClick();
@@ -83,6 +84,7 @@ public class SettingsFragment extends Fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isChanged = false;
+        isNotifChnged = false;
     }
 
     @Override
@@ -150,10 +152,12 @@ public class SettingsFragment extends Fragment
                 if (isChecked)
                 {
                     setNotifTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
+                    isNotifChnged = true;
                 }
                 else
                 {
                     setNotifTB.setBackgroundColor(Color.RED);
+                    isNotifChnged = true;
                 }
                 new UserDataStorage(getActivity()).saveNotificationsCheck(isChecked);
             }
@@ -220,9 +224,7 @@ public class SettingsFragment extends Fragment
         message.addParam("os", Build.VERSION.RELEASE);
         try {
             MessageSender.send(getActivity(), message);
-        } catch (IncorrectDataException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IncorrectDataException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -240,9 +242,7 @@ public class SettingsFragment extends Fragment
         message.addParam("token", FirebaseInstanceId.getInstance().getToken());
         try {
             MessageSender.send(getActivity(), message);
-        } catch (IncorrectDataException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IncorrectDataException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -275,6 +275,12 @@ public class SettingsFragment extends Fragment
 
     private void saveAlarmParam()
     {
+        if (isNotifChnged)
+            if(setNotifTB.isChecked())
+                enableNotifications();
+            else
+                disableNotifications();
+
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
         if (((CheckBox)view.findViewById(R.id.checkBox1)).isChecked()) {
             dayOfWeeks.add(DayOfWeek.MONDAY);
