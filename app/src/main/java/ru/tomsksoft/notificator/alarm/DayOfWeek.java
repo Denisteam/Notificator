@@ -56,11 +56,10 @@ public enum DayOfWeek {
         Set<DayOfWeek> dayOfWeeks = new HashSet<>();
 
         for (DayOfWeek dayOfWeek: values()) {
-            if ( (dayOfWeek.getValue() & mask) == 1) {
+            if ( (dayOfWeek.getValue() & mask) > 0) {
                 dayOfWeeks.add(dayOfWeek);
             }
         }
-
         return dayOfWeeks;
     }
 }

@@ -21,6 +21,8 @@ import ru.tomsksoft.notificator.UserDataStorage;
 
 public class AlarmReceiver extends BroadcastReceiver {
     private static final String TAG = "ALARM";
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEEE", Locale.ENGLISH);
+
     Context appContext;
 
     @Override
@@ -35,6 +37,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         int minute = tmp[1];
 
         Set<DayOfWeek> dayOfWeekSet = dataStorage.loadDaysOfWeekSet();
+        dayOfWeekSet.remove(DayOfWeek.valueOf(DATE_FORMAT.format(new Date()).toUpperCase()));
         AlarmTuner.setAlarm(appContext, hourOfDay, minute, alarmIntent, dayOfWeekSet);
 
         sendNotification("Если вы опаздываете - оповеcтите об этом");

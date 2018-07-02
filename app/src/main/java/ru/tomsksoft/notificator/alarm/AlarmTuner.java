@@ -19,9 +19,11 @@ public class AlarmTuner {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         DayOfWeek currentDay = DayOfWeek.valueOf(DATE_FORMAT.format(new Date()).toUpperCase());
         int min = 8;
-        for (DayOfWeek dayOfWeek: dayOfWeekSet) {
+        for (DayOfWeek dayOfWeek: dayOfWeekSet)
+        {
             int d = DayOfWeek.countOfDaysBetween(currentDay, dayOfWeek);
-            if (d < min) {
+            if (d < min)
+            {
                 min = d;
             }
         }
@@ -30,16 +32,18 @@ public class AlarmTuner {
             return;
         }
 
+        SimpleDateFormat logDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Calendar calendar = Calendar.getInstance();
+
+        Log.d(TAG, logDate.format(calendar.getTime()));
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
         calendar.add(Calendar.DATE, min);
-        SimpleDateFormat logDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Log.d(TAG, logDate.format(calendar.getTime()));
+        Log.d(TAG, String.valueOf(min));
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000 * 60 * 60 * 24, alarmIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
     }
 
     public static void disableAlarm(Context context, PendingIntent intent) {

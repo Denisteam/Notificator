@@ -24,7 +24,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,7 +44,7 @@ import static android.content.Context.ALARM_SERVICE;
 
 public class SettingsFragment extends Fragment
 {
-
+    private static final String TAG = "SETTINGS_ACTIVITY";
     private AlarmManager am;
     private PendingIntent alarmIntent;
     private TimePicker tp;
@@ -275,6 +274,8 @@ public class SettingsFragment extends Fragment
 
     private void saveAlarmParam()
     {
+        new UserDataStorage(getActivity()).setAlarmEnable(true);
+
         if (isNotifChnged)
             if(setNotifTB.isChecked())
                 enableNotifications();
