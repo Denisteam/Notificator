@@ -37,7 +37,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         int minute = tmp[1];
 
         Set<DayOfWeek> dayOfWeekSet = dataStorage.loadDaysOfWeekSet();
-        dayOfWeekSet.remove(DayOfWeek.valueOf(DATE_FORMAT.format(new Date()).toUpperCase()));
+        //dayOfWeekSet.remove(DayOfWeek.valueOf(DATE_FORMAT.format(new Date()).toUpperCase()));
         AlarmTuner.setAlarm(appContext, hourOfDay, minute, alarmIntent, dayOfWeekSet);
 
         sendNotification("Если вы опаздываете - оповеcтите об этом");

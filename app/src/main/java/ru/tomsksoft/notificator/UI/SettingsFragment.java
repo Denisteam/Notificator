@@ -117,21 +117,18 @@ public class SettingsFragment extends Fragment
         setAlarmTB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                saveAlarmParam();
                 acceptTextView.setVisibility(View.VISIBLE);
                 isChanged = true;
                 if (isChecked)
                 {
                     setAlarmTB.setBackgroundColor(Color.argb(255, 0, 153, 204));
                     alarmSettingsLayout.setVisibility(View.VISIBLE);
-                    loadAlarmParam();
                 }
                 else
                 {
 
                     setAlarmTB.setBackgroundColor(Color.RED);
                     alarmSettingsLayout.setVisibility(View.INVISIBLE);
-                    disableAlarm();
                 }
             }
         });
@@ -193,7 +190,7 @@ public class SettingsFragment extends Fragment
     {
         @Override
         public void onClick(View v) {
-            enableAlarm();
+            saveAlarmParam();
             Toast.makeText(getActivity(), R.string.saved_settings, Toast.LENGTH_SHORT).show();
             onSomeClick(v);
         }
@@ -237,7 +234,7 @@ public class SettingsFragment extends Fragment
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
 
-        Message message = new Message(getActivity(), RPCMethod.TOKEN_ADD);
+        Message message = new Message(getActivity(), RPCMethod.TOKEN_DELETE);
         message.addParam("token", FirebaseInstanceId.getInstance().getToken());
         try {
             MessageSender.send(getActivity(), message);
@@ -248,8 +245,6 @@ public class SettingsFragment extends Fragment
 
     public void enableAlarm()
     {
-        saveAlarmParam();
-
         ComponentName receiver = new ComponentName(getActivity(), AlarmBootReceiver.class);
         PackageManager pm = getActivity().getPackageManager();
 
@@ -313,7 +308,15 @@ public class SettingsFragment extends Fragment
 
         int hourOfDay = tp.getCurrentHour();
         int minute = tp.getCurrentMinute();
-        AlarmTuner.setAlarm(getActivity(), hourOfDay, minute, alarmIntent, dayOfWeeks);
+        if(setAlarmTB.isChecked())
+        {
+            enableAlarm();
+            AlarmTuner.setAlarm(getActivity(), hourOfDay, minute, alarmIntent, dayOfWeeks);
+        }
+        else
+        {
+            disableAlarm();
+        }
         UserDataStorage dataStorage = new UserDataStorage(getActivity());
         dataStorage.saveAlarmParam(dayOfWeeks, hourOfDay, minute);
     }
@@ -335,11 +338,5 @@ public class SettingsFragment extends Fragment
         int[] tmp = dataStorage.getTime();
         tp.setCurrentHour(tmp[0]);
         tp.setCurrentMinute(tmp[1]);
-    }
-
-    @Override
-    public void onDestroy() {
-        saveAlarmParam();
-        super.onDestroy();
     }
 }

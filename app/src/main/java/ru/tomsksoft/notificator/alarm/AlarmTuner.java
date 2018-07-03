@@ -35,13 +35,24 @@ public class AlarmTuner {
         SimpleDateFormat logDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Calendar calendar = Calendar.getInstance();
 
-        Log.d(TAG, logDate.format(calendar.getTime()));
+//Если будильник ставится на текущий день недели, то проверяем время, если время врабатывания позже чем текущее,
+// то ставим на след. неделю, иначе на сегодня, т.к. время срабатывания ещё не настало
+        if (min == 0)
+        {
+            if((Calendar.HOUR_OF_DAY > hourOfDay) || (Calendar.HOUR_OF_DAY == hourOfDay && Calendar.MINUTE >= minute))
+            {
+                calendar.add(Calendar.DATE, 7);
+            }
+        }
+        else
+        {
+            calendar.add(Calendar.DATE, min);
+        }
+
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
-        calendar.add(Calendar.DATE, min);
         Log.d(TAG, logDate.format(calendar.getTime()));
-        Log.d(TAG, String.valueOf(min));
 
         alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
     }
