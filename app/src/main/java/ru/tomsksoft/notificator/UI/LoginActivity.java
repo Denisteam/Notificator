@@ -30,10 +30,13 @@ import ru.tomsksoft.notificator.message.RPCMethod;
 public class LoginActivity extends AppCompatActivity implements SettingsFragment.OnClickSettingsListener{
     private static final String TAG = "LOGIN_ACTIVITY";
     private FragmentManager fragmentManager;
+    private MenuItem settingsMI;
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_login, menu);
+        settingsMI = menu.findItem(R.id.settings);
         return true;
     }
 
@@ -71,6 +74,7 @@ public class LoginActivity extends AppCompatActivity implements SettingsFragment
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
             findViewById(R.id.log_in_layout).setVisibility(View.INVISIBLE);
+            settingsMI.setVisible(false);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -148,6 +152,7 @@ public class LoginActivity extends AppCompatActivity implements SettingsFragment
                 .addToBackStack(null)
                 .commit();
         findViewById(R.id.log_in_layout).setVisibility(View.VISIBLE);
+        settingsMI.setVisible(true);
     }
 
     @Override

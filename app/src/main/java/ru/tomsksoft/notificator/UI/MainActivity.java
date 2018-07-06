@@ -49,10 +49,15 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
     private ArrayAdapter<String> listAdapter;
     private static Calendar calendar;
     private FragmentManager fragmentManager;
+    private MenuItem sendMI;
+    private MenuItem settingsMI;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        sendMI = menu.findItem(R.id.send_message);
+        settingsMI = menu.findItem(R.id.settings);
+        super.onCreateOptionsMenu(menu);
         return true;
     }
 
@@ -115,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
                 .commit();
         findViewById(R.id.layoutMessage).setVisibility(View.VISIBLE);
         findViewById(R.id.layoutDate).setVisibility(View.VISIBLE);
+        sendMI.setVisible(true);
+        settingsMI.setVisible(true);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -131,6 +138,8 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
                         .commit();
                 findViewById(R.id.layoutMessage).setVisibility(View.INVISIBLE);
                 findViewById(R.id.layoutDate).setVisibility(View.INVISIBLE);
+                sendMI.setVisible(false);
+                settingsMI.setVisible(false);
                 return true;
             case R.id.exit:
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
