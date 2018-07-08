@@ -1,9 +1,11 @@
 package ru.tomsksoft.notificator.UI;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -18,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import ru.tomsksoft.notificator.NotificationRepeater;
 import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserCreditans;
 import ru.tomsksoft.notificator.UserDataStorage;
@@ -43,6 +46,13 @@ public class LoginActivity extends AppCompatActivity implements SettingsFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getIntent().getBooleanExtra("cancel", false)) {
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent intent = new Intent(this, NotificationRepeater.class);
+            PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            am.cancel(alarmIntent);
+        }
+
         setContentView(R.layout.activity_login);
         ((EditText) findViewById(R.id.login)).setText("ntakovoy");
         ((EditText) findViewById(R.id.password)).setText("aoiwnu91su3");

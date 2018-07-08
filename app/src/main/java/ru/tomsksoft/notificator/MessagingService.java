@@ -1,5 +1,6 @@
 package ru.tomsksoft.notificator;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -25,14 +26,30 @@ public class MessagingService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
+        Context appContext = this.getApplicationContext();
+        AlarmManager am = (AlarmManager) appContext.getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(appContext, NotificationRepeater.class);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-        if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "MessageSender data payload: " + remoteMessage.getData());
-
+        if (remoteMessage.getData().containsValue("STOP")) {
+            am.cancel(alarmIntent);
+            return;
         }
 
         if (remoteMessage.getNotification() != null) {
+            intent.putExtra("title", remoteMessage.getNotification().getTitle());
+            intent.putExtra("body", remoteMessage.getNotification().getBody());
             Log.d(TAG, "MessageSender Notification Body: " + remoteMessage.getNotification().getBody());
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (60 * 1000), alarmIntent);
+        } else {
+            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (60 * 1000), alarmIntent);
+        }
+        if (remoteMessage.getData().size() > 0) {
+            Log.d(TAG, "MessageSender data payload: " + remoteMessage.getData());
+        }
+
     }
 }

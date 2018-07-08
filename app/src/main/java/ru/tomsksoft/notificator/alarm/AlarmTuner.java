@@ -37,15 +37,11 @@ public class AlarmTuner {
 
 //Если будильник ставится на текущий день недели, то проверяем время, если время врабатывания позже чем текущее,
 // то ставим на след. неделю, иначе на сегодня, т.к. время срабатывания ещё не настало
-        if (min == 0)
-        {
-            if((Calendar.HOUR_OF_DAY > hourOfDay) || (Calendar.HOUR_OF_DAY == hourOfDay && Calendar.MINUTE >= minute))
-            {
+        if (min == 0) {
+            if((Calendar.HOUR_OF_DAY > hourOfDay) || (Calendar.HOUR_OF_DAY == hourOfDay && Calendar.MINUTE >= minute)) {
                 calendar.add(Calendar.DATE, 7);
             }
-        }
-        else
-        {
+        } else {
             calendar.add(Calendar.DATE, min);
         }
 

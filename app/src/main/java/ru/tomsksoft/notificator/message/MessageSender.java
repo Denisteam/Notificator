@@ -49,15 +49,11 @@ public class MessageSender {
                     Log.d(TAG, password);
                     Authenticator.setDefault(new Authenticator() {
                         protected PasswordAuthentication getPasswordAuthentication() {
-                            if (!alreadyTriedAuthenticating) {
-                                alreadyTriedAuthenticating = true;
-                                return new PasswordAuthentication(userName, password.toCharArray());
-                            } else {
-                                return null;
-                            }
+                            return new PasswordAuthentication(userName, password.toCharArray());
                         }
                     });
                     HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+                    connection.setInstanceFollowRedirects(false);
                     connection.setConnectTimeout(TIMEOUT_VALUE);
                     connection.setReadTimeout(TIMEOUT_VALUE);
                     connection.setDoOutput(true);
@@ -131,18 +127,14 @@ public class MessageSender {
                     Log.d(TAG, password);
                     Authenticator.setDefault(new Authenticator() {
                         protected PasswordAuthentication getPasswordAuthentication() {
-                            if (!alreadyTriedAuthenticating) {
-                                alreadyTriedAuthenticating = true;
-                                return new PasswordAuthentication(userName, password.toCharArray());
-                            } else {
-                                return null;
-                            }
+                            return new PasswordAuthentication(userName, password.toCharArray());
                         }
                     });
 
                     HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
                     connection.setConnectTimeout(TIMEOUT_VALUE);
                     connection.setReadTimeout(TIMEOUT_VALUE);
+                    connection.setInstanceFollowRedirects(false);
                     connection.connect();
 
                     int rc = connection.getResponseCode();
@@ -165,9 +157,7 @@ public class MessageSender {
             }
         });
         executor.shutdown();
-
         executor.awaitTermination(5, TimeUnit.SECONDS);
-
         if (result.isDone()) {
             boolean res;
             try {

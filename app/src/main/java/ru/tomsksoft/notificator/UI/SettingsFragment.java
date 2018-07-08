@@ -126,7 +126,6 @@ public class SettingsFragment extends Fragment
                 }
                 else
                 {
-
                     setAlarmTB.setBackgroundColor(Color.RED);
                     alarmSettingsLayout.setVisibility(View.INVISIBLE);
                 }
