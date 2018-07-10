@@ -37,9 +37,9 @@ public class NotificationRepeater extends BroadcastReceiver {
             tmpIntent.putExtra("body", body);
             PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, tmpIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000, alarmIntent);
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 180000, alarmIntent);
             } else {
-                am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000, alarmIntent);
+                am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 180000, alarmIntent);
             }
 
             Log.d(TAG, body);
