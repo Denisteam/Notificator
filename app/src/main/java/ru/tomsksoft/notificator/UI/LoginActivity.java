@@ -46,12 +46,6 @@ public class LoginActivity extends AppCompatActivity implements SettingsFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getIntent().getBooleanExtra("cancel", false)) {
-            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-            Intent intent = new Intent(this, NotificationRepeater.class);
-            PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-            am.cancel(alarmIntent);
-        }
 
         setContentView(R.layout.activity_login);
         ((EditText) findViewById(R.id.login)).setText("ntakovoy");

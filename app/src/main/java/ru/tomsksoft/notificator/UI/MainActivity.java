@@ -1,11 +1,13 @@
 package ru.tomsksoft.notificator.UI;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -34,6 +36,7 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 
+import ru.tomsksoft.notificator.NotificationRepeater;
 import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserDataStorage;
 import ru.tomsksoft.notificator.exceptions.IncorrectDataException;
@@ -84,6 +87,26 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
                 Object value = getIntent().getExtras().get(key);
                 Log.d(TAG, "Key: " + key + " Value: " + value);
             }
+        }
+
+        if (getIntent().getBooleanExtra("cancel", false)) {
+            AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent intent = new Intent(this, NotificationRepeater.class);
+            PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            am.cancel(alarmIntent);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle(R.string.message)
+                    .setMessage(getIntent().getStringExtra("notificationText"))
+                    .setCancelable(false)
+                    .setNegativeButton(R.string.ok,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
 
         ListView listView = findViewById(R.id.list_templates);

@@ -8,14 +8,17 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Set;
 
 import ru.tomsksoft.notificator.UI.LoginActivity;
+import ru.tomsksoft.notificator.UI.MainActivity;
 
 import static android.content.Context.ALARM_SERVICE;
 
@@ -27,25 +30,26 @@ public class NotificationRepeater extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String title = intent.getStringExtra("title");
             String body = intent.getStringExtra("body");
             appContext = context.getApplicationContext();
             AlarmManager am = (AlarmManager) appContext.getSystemService(ALARM_SERVICE);
             Intent tmpIntent = new Intent(appContext, NotificationRepeater.class);
+            tmpIntent.putExtra("body", body);
             PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, tmpIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (60 * 1000), alarmIntent);
+                am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000, alarmIntent);
             } else {
-                am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (60 * 1000), alarmIntent);
+                am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000, alarmIntent);
             }
 
-            sendNotification(title, body);
+            Log.d(TAG, body);
+            sendNotification(body);
         }
 
-        private void sendNotification(String title, String messageBody) {
-            Intent intent = new Intent(appContext, LoginActivity.class);
+        private void sendNotification(String messageBody) {
+            Intent intent = new Intent(appContext, MainActivity.class);
             intent.putExtra("cancel", true);
-            //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("notificationText", messageBody);
             PendingIntent pendingIntent = PendingIntent.getActivity(appContext, 0, intent,
                     PendingIntent.FLAG_ONE_SHOT);
 
@@ -53,11 +57,13 @@ public class NotificationRepeater extends BroadcastReceiver {
             NotificationCompat.Builder notificationBuilder =
                     new NotificationCompat.Builder(appContext, channelId)
                             .setSmallIcon(R.drawable.ic_launcher)
-                            .setContentTitle(title)
+                            .setContentTitle("Notificator")
                             .setContentText(messageBody)
                             .setAutoCancel(true)
+                            .setShowWhen(true)
+                            .setVibrate(new long[]{1000, 2000, 1000, 2000, 1000, 2000})
+                            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE))
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setDefaults(Notification.DEFAULT_ALL)
                             .setContentIntent(pendingIntent);
 
             NotificationManager notificationManager =

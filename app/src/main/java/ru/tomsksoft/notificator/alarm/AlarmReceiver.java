@@ -7,8 +7,10 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,13 +22,14 @@ import ru.tomsksoft.notificator.R;
 import ru.tomsksoft.notificator.UserDataStorage;
 
 public class AlarmReceiver extends BroadcastReceiver {
-    private static final String TAG = "ALARM";
+    private static final String TAG = "ALARM_RECEIVER";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("EEEE", Locale.ENGLISH);
 
     Context appContext;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive");
         appContext = context.getApplicationContext();
         Intent target = new Intent(appContext, AlarmReceiver.class);
         PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, target, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -56,8 +59,9 @@ public class AlarmReceiver extends BroadcastReceiver {
                         .setContentTitle("Notificator")
                         .setContentText(messageBody)
                         .setAutoCancel(true)
+                        .setVibrate(new long[]{1000, 2000, 1000, 2000, 1000, 2000})
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setDefaults(Notification.DEFAULT_ALL)
                         .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =

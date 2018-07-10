@@ -16,7 +16,13 @@ import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import ru.tomsksoft.notificator.UI.MainActivity;
+import ru.tomsksoft.notificator.alarm.AlarmReceiver;
+import ru.tomsksoft.notificator.alarm.AlarmTuner;
+import ru.tomsksoft.notificator.alarm.DayOfWeek;
 
 public class MessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMsgService";
@@ -29,6 +35,7 @@ public class MessagingService extends FirebaseMessagingService {
         Context appContext = this.getApplicationContext();
         AlarmManager am = (AlarmManager) appContext.getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(appContext, NotificationRepeater.class);
+        intent.putExtra("body", remoteMessage.getData().get("body"));
         PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         if (remoteMessage.getData().containsValue("STOP")) {
@@ -36,20 +43,18 @@ public class MessagingService extends FirebaseMessagingService {
             return;
         }
 
-        if (remoteMessage.getNotification() != null) {
-            intent.putExtra("title", remoteMessage.getNotification().getTitle());
-            intent.putExtra("body", remoteMessage.getNotification().getBody());
-            Log.d(TAG, "MessageSender Notification Body: " + remoteMessage.getNotification().getBody());
-        }
+        Log.d(TAG, "MessageSender Notification Body: " + remoteMessage.getData().get("body"));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (60 * 1000), alarmIntent);
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 15000, alarmIntent);
         } else {
-            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (60 * 1000), alarmIntent);
+            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
         }
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "MessageSender data payload: " + remoteMessage.getData());
         }
+
+        //AlarmTuner.setAlarm(appContext, 13, 55, alarmIntent, DayOfWeek.getListOfDayOfWeekByMask(DayOfWeek.WEEK));
 
     }
 }
