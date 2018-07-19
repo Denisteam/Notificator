@@ -31,10 +31,15 @@ public class NotificationRepeater extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String body = intent.getStringExtra("body");
+            String title = intent.getStringExtra("title");
+            if (body == null) { body = ""; }
+            if (title == null) { title = ""; }
+
             appContext = context.getApplicationContext();
             AlarmManager am = (AlarmManager) appContext.getSystemService(ALARM_SERVICE);
             Intent tmpIntent = new Intent(appContext, NotificationRepeater.class);
             tmpIntent.putExtra("body", body);
+            tmpIntent.putExtra("title", title);
             PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, tmpIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 180000, alarmIntent);
@@ -43,10 +48,10 @@ public class NotificationRepeater extends BroadcastReceiver {
             }
 
             Log.d(TAG, body);
-            sendNotification(body);
+            sendNotification(body, title);
         }
 
-        private void sendNotification(String messageBody) {
+        private void sendNotification(String messageBody, String title) {
             Intent intent = new Intent(appContext, MainActivity.class);
             intent.putExtra("cancel", true);
             intent.putExtra("notificationText", messageBody);
@@ -57,7 +62,7 @@ public class NotificationRepeater extends BroadcastReceiver {
             NotificationCompat.Builder notificationBuilder =
                     new NotificationCompat.Builder(appContext, channelId)
                             .setSmallIcon(R.drawable.ic_launcher)
-                            .setContentTitle("Notificator")
+                            .setContentTitle(title)
                             .setContentText(messageBody)
                             .setAutoCancel(true)
                             .setShowWhen(true)

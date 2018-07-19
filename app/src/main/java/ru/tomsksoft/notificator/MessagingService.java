@@ -36,6 +36,8 @@ public class MessagingService extends FirebaseMessagingService {
         AlarmManager am = (AlarmManager) appContext.getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(appContext, NotificationRepeater.class);
         intent.putExtra("body", remoteMessage.getData().get("body"));
+        intent.putExtra("title", remoteMessage.getData().get("title"));
+
         PendingIntent alarmIntent = PendingIntent.getBroadcast(appContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         if (remoteMessage.getData().containsValue("STOP")) {
