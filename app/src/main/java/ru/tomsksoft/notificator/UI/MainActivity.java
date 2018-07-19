@@ -229,9 +229,9 @@ public class MainActivity extends AppCompatActivity implements SettingsFragment.
         Message message = new Message(this, RPCMethod.NOTIFICATION);
         message.addParam("type", "1");
         message.addParam("message", msg);
-        message.addParam("date", dateFormat.format(new Date()));
+        message.addParam("date", dateFormat.format(calendar.getTime()));
         //TODO(Nikita): add remind_at
-        message.addParam("remind_at", "00-00-00");
+        message.addParam("remind_at", "");
 
         try {
             boolean result = MessageSender.send(MainActivity.this, message);

@@ -57,6 +57,7 @@ public class MessageSender {
                     connection.setConnectTimeout(TIMEOUT_VALUE);
                     connection.setReadTimeout(TIMEOUT_VALUE);
                     connection.setDoOutput(true);
+                    connection.setRequestProperty("Accept-Charset", "UTF-8");
                     connection.setDoInput(true);
                     connection.setRequestMethod("POST");
 

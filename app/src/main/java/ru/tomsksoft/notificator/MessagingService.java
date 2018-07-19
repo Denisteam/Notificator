@@ -53,8 +53,5 @@ public class MessagingService extends FirebaseMessagingService {
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "MessageSender data payload: " + remoteMessage.getData());
         }
-
-        //AlarmTuner.setAlarm(appContext, 13, 55, alarmIntent, DayOfWeek.getListOfDayOfWeekByMask(DayOfWeek.WEEK));
-
     }
 }
